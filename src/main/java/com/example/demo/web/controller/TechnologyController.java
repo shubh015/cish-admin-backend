@@ -30,6 +30,7 @@ public class TechnologyController {
      * Create a new technology
      */
     @PostMapping
+       @CrossOrigin("*")
     public ResponseEntity<TechnologyDto> create(@Valid @RequestBody TechnologyCreateDto dto) {
         Technology saved = technologyService.create(dto, "system"); // user hardcoded for now
         return ResponseEntity.status(HttpStatus.CREATED).body(TechnologyMapper.INSTANCE.toDto(saved));
@@ -39,6 +40,7 @@ public class TechnologyController {
      * List/search technologies
      */
     @GetMapping
+       @CrossOrigin("*")
     public Page<TechnologyDto> list(@RequestParam(required = false) String q,
                                     @PageableDefault(size = 20) Pageable pageable) {
         Page<Technology> page = technologyService.search(q, pageable);
@@ -49,6 +51,7 @@ public class TechnologyController {
      * Get technology by id
      */
     @GetMapping("/{id}")
+       @CrossOrigin("*")
     public ResponseEntity<TechnologyDto> get(@PathVariable Long id) {
         Technology t = techRepo.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
@@ -59,6 +62,7 @@ public class TechnologyController {
      * Update a technology
      */
     @PutMapping("/{id}")
+       @CrossOrigin("*")
     public ResponseEntity<TechnologyDto> update(@PathVariable Long id,
                                                 @RequestBody TechnologyUpdateDto dto) {
         Technology t = technologyService.update(id, dto, "system");
@@ -69,6 +73,7 @@ public class TechnologyController {
      * Soft delete a technology
      */
     @DeleteMapping("/{id}")
+       @CrossOrigin("*")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) {
         technologyService.softDelete(id, "system");

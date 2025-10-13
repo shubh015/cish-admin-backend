@@ -24,6 +24,7 @@ public class KeyContentController {
      * Each request contains only one key (like keyResearch, jobs, tenders, etc.)
      */
     @PostMapping("/save")
+     @CrossOrigin("*")
     public String saveContent(@RequestBody Map<String, List<Map<String, Object>>> payload) {
         if (payload.isEmpty()) {
             return "❌ No content provided!";
@@ -52,6 +53,7 @@ public class KeyContentController {
      * ✅ GET /api/content/{key}
      */
     @GetMapping("/{key}")
+     @CrossOrigin("*")
     public List<KeyContent> getContentByKey(@PathVariable String key) {
         return service.getContents(key);
     }

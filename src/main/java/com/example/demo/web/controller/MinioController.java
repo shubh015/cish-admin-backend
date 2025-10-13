@@ -19,6 +19,7 @@ public class MinioController {
 
     // Generic upload (banner etc.)
     @PostMapping("/upload")
+     @CrossOrigin("*")
     public ResponseEntity<Map<String, String>> upload(@RequestParam("file") MultipartFile file,
                                                       @RequestParam(value = "isActive", required = false) String isActive) {
         try {
@@ -32,6 +33,7 @@ public class MinioController {
 
     // Director desk upload
     @PostMapping("/upload/director")
+     @CrossOrigin("*")
     public ResponseEntity<Map<String, String>> uploadDirector(@RequestParam("file") MultipartFile file,
                                                               @RequestParam(value = "description", required = false) String description,
                                                               @RequestParam(value = "isDirector", required = false) String isDirector) {
@@ -48,6 +50,7 @@ public class MinioController {
 
     // Get all files
     @GetMapping("/getAll")
+     @CrossOrigin("*")
     public ResponseEntity<List<Map<String, String>>> getAll() {
         try {
             return ResponseEntity.ok(minioService.getAllFiles());

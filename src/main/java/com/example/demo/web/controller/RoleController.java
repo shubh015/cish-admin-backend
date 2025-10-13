@@ -31,6 +31,7 @@ public class RoleController {
     }
 
     @PutMapping("/{id}")
+     @CrossOrigin("*")
     public ResponseEntity<RoleDto> updateRole(
             @PathVariable Long id,
             @Valid @RequestBody RoleRequest request) {
@@ -38,18 +39,21 @@ public class RoleController {
     }
 
     @DeleteMapping("/{id}")
+    @CrossOrigin("*")
     public ResponseEntity<Void> deleteRole(@PathVariable Long id) {
         roleService.deleteRole(id);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/assign/{userId}/{roleId}")
+    @CrossOrigin("*")
     public ResponseEntity<Void> assignRole(@PathVariable Long userId, @PathVariable Long roleId) {
         roleService.assignRoleToUser(userId, roleId);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/remove/{userId}/{roleId}")
+    @CrossOrigin("*")
     public ResponseEntity<Void> removeRole(@PathVariable Long userId, @PathVariable Long roleId) {
         roleService.removeRoleFromUser(userId, roleId);
         return ResponseEntity.ok().build();

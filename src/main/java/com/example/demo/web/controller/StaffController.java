@@ -25,6 +25,7 @@ public class StaffController {
     }
 
     @GetMapping("/{id}")
+       @CrossOrigin("*")
     public ResponseEntity<Staff> getStaffById(@PathVariable Long id) {
         return staffService.getStaffById(id)
                 .map(ResponseEntity::ok)
@@ -32,11 +33,13 @@ public class StaffController {
     }
 
     @PostMapping
+       @CrossOrigin("*")
     public Staff createStaff(@RequestBody Staff staff) {
         return staffService.createStaff(staff);
     }
 
     @PutMapping("/{id}")
+       @CrossOrigin("*")
     public ResponseEntity<Staff> updateStaff(@PathVariable Long id, @RequestBody Staff staff) {
         try {
             return ResponseEntity.ok(staffService.updateStaff(id, staff));
@@ -46,6 +49,7 @@ public class StaffController {
     }
 
     @DeleteMapping("/{id}")
+       @CrossOrigin("*")
     public ResponseEntity<Void> deleteStaff(@PathVariable Long id) {
         staffService.deleteStaff(id);
         return ResponseEntity.noContent().build();

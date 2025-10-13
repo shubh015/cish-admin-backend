@@ -23,6 +23,7 @@ public class NewsEventController {
 
     // Save API for newsEvent or vksa
     @PostMapping("/save")
+     @CrossOrigin("*")
     public Object saveNews(@RequestBody Map<String, Object> request) {
         if (request.containsKey("newsEvent")) {
             Map<String, Object> newsMap = (Map<String, Object>) request.get("newsEvent");
@@ -41,6 +42,7 @@ public class NewsEventController {
 
     // GET API by type, returns clean JSON
     @GetMapping
+     @CrossOrigin("*")
     public List<NewsEventResponse> getByType(@RequestParam String type) {
         if (!type.equals("newsEvent") && !type.equals("vksa")) {
             throw new IllegalArgumentException("Type must be 'newsEvent' or 'vksa'");

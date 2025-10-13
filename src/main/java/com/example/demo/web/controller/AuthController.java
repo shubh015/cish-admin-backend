@@ -2,6 +2,7 @@ package com.example.demo.web.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,18 +27,21 @@ public class AuthController {
   private final PasswordResetService resetService;
 
   @PostMapping("/register")
+  @CrossOrigin("*")
   public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest req) {
     authService.register(req);
     return ResponseEntity.status(HttpStatus.CREATED).build();
   }
 
   @PostMapping("/login")
+   @CrossOrigin("*")
   public ResponseEntity<AuthResponse> login(@Valid @RequestBody AuthRequest req) {
     AuthResponse r = authService.login(req);
     return ResponseEntity.ok(r);
   }
 
   @PostMapping("/forgot-password")
+   @CrossOrigin("*")
   public ResponseEntity<?> forgotPassword(@Valid @RequestBody ForgotPasswordRequest req) {
     resetService.requestReset(req.getEmail());
     // Always return 200 to avoid email enumeration
@@ -45,6 +49,7 @@ public class AuthController {
   }
 
   @PostMapping("/reset-password")
+   @CrossOrigin("*")
   public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordRequest req) {
     resetService.resetPassword(req.getToken(), req.getNewPassword());
     return ResponseEntity.ok().build();
