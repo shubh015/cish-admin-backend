@@ -37,6 +37,7 @@ public class SecurityConfig {
         .csrf(AbstractHttpConfigurer::disable)
         .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> auth
+            .requestMatchers("/api/**").permitAll()
             .requestMatchers("/api/auth/**").permitAll()
             .requestMatchers("/api/v1/technologies/**").permitAll() 
             .requestMatchers("/api/staff/**").permitAll()
@@ -45,6 +46,7 @@ public class SecurityConfig {
             .requestMatchers("/api/news/**").permitAll()
             .requestMatchers("/api/content/**").permitAll()
             .requestMatchers("/test/files/**").permitAll()
+
             
             .anyRequest().authenticated())
 
