@@ -94,4 +94,17 @@ public class MinioService {
         }
         return files;
     }
+
+    public MinioClient getMinioClient() {
+    return minioClient;
+}
+
+public String getBucketName() {
+    return bucketName;
+}
+
+public String getMinioUrl() {
+    return minioUrl;
+}
+
 }
