@@ -30,7 +30,7 @@ public class RoleController {
         return ResponseEntity.ok(roleService.createRole(request));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/{id}")          
      @CrossOrigin("*")
     public ResponseEntity<RoleDto> updateRole(
             @PathVariable Long id,
