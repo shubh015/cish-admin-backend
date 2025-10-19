@@ -46,8 +46,7 @@ public class SecurityConfig {
             .requestMatchers("/api/news/**").permitAll()
             .requestMatchers("/api/content/**").permitAll()
             .requestMatchers("/test/files/**").permitAll()
-
-            
+            .requestMatchers("/api/subdepartments/**").permitAll() 
             .anyRequest().authenticated())
 
         .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
