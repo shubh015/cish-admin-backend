@@ -8,4 +8,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
-public class ResetPasswordRequest { @NotNull private UUID token; @NotBlank @Size(min=8) private String newPassword; }
+public class ResetPasswordRequest {
+     @NotNull private UUID token; 
+     @NotBlank @Size(min=8) private String newPassword;
+     }
