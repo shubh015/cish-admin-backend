@@ -28,8 +28,15 @@ public class NewsEventService {
         return repo.saveAll(list);
     }
 
-    public List<NewsEvent> getByType(String type) {
-        return repo.findByType(type);
+    public List<NewsEvent> getByType(String type, String role) {
+
+        if(role != null ){
+            if(role.equalsIgnoreCase("admin"))
+               return repo.findByTypeIgnoreCaseAndIspublishedFalseAndIsactiveTrue(type);
+            if(role.equalsIgnoreCase("creater"))
+                return repo.findByTypeIgnoreCaseAndBacktocreatorTrue(type);     
+        }
+        return repo.findByTypeIgnoreCaseAndIspublishedTrueAndIsactiveTrue(type);
     }
 
     @Transactional

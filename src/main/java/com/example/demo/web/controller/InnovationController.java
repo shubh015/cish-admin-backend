@@ -43,7 +43,7 @@ public class InnovationController {
 
     @GetMapping
     @CrossOrigin("*")
-    public List<Innovation> getInnovations(@RequestParam("key") String key) {
+    public List<Innovation> getInnovations(@RequestParam("key") String key , @RequestParam(value = "role", required = false) String role) {
         String type;
         if (key.equalsIgnoreCase("technology")) {
             type = "TECHNOLOGY";
@@ -53,7 +53,7 @@ public class InnovationController {
             throw new IllegalArgumentException("Invalid key. Use 'technology' or 'varities'.");
         }
 
-        return service.getByType(type);
+        return service.getByType(type,role);
     }
 
     @PostMapping("/status")
@@ -91,9 +91,5 @@ public class InnovationController {
         }
     }
 
-     @GetMapping("/ping")
-    public ResponseEntity<String> ping() {
-        return ResponseEntity.ok("API is working fine!");
-    }
-
+    
 }

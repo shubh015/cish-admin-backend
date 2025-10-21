@@ -24,8 +24,15 @@ public class KeyContentService {
         repository.saveAll(contents);
     }
 
-    public List<KeyContent> getContents(String key) {
-        return repository.findByContentKey(key);
+    public List<KeyContent> getContents(String key,String role) {
+
+        if(role != null ){
+            if(role.equalsIgnoreCase("admin"))
+               return repository.findByContentKeyAndIspublishedFalseAndIsactiveTrue(key);
+            if(role.equalsIgnoreCase("creater"))
+                return repository.findByContentKeyAndBacktocreatorTrue(key);     
+        }
+        return repository.findByContentKeyAndIspublishedTrueAndIsactiveTrue(key);
     }
 
     @Transactional

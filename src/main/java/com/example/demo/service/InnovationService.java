@@ -23,8 +23,14 @@ public class InnovationService {
         repository.saveAll(list);
     }
 
-    public List<Innovation> getByType(String type) {
-        return repository.findByTypeIgnoreCase(type);
+    public List<Innovation> getByType(String type,String role) {
+        if(role != null ){
+            if(role.equalsIgnoreCase("admin"))
+               return repository.findByTypeIgnoreCaseAndIspublishedFalseAndIsactiveTrue(type);
+            if(role.equalsIgnoreCase("creater"))
+                return repository.findByTypeIgnoreCaseAndBacktocreatorTrue(type);     
+        }
+        return repository.findByTypeIgnoreCaseAndIspublishedTrueAndIsactiveTrue(type);
     }
 
 

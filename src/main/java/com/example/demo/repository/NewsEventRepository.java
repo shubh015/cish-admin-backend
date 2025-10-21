@@ -9,4 +9,9 @@ import java.util.List;
 
 public interface NewsEventRepository extends JpaRepository<NewsEvent, Long> {
     List<NewsEvent> findByType(String type);
+
+     List<NewsEvent> findByTypeIgnoreCaseAndIspublishedTrueAndIsactiveTrue(String type);
+    List<NewsEvent> findByTypeIgnoreCaseAndIspublishedFalseAndIsactiveTrue(String type);
+    List<NewsEvent> findByTypeIgnoreCaseAndBacktocreatorTrue(String type);
+
 }

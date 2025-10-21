@@ -56,8 +56,8 @@ public class KeyContentController {
      */
     @GetMapping("/{key}")
      @CrossOrigin("*")
-    public List<KeyContent> getContentByKey(@PathVariable String key) {
-        return service.getContents(key);
+    public List<KeyContent> getContentByKey(@PathVariable String key,@RequestParam(required = false) String role) {
+        return service.getContents(key,role);
     }
 
 

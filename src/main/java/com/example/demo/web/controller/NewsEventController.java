@@ -46,11 +46,11 @@ public class NewsEventController {
     // GET API by type, returns clean JSON
     @GetMapping
      @CrossOrigin("*")
-    public List<NewsEventResponse> getByType(@RequestParam String type) {
+    public List<NewsEventResponse> getByType(@RequestParam String type, @RequestParam(required = false) String role) {
         if (!type.equals("newsEvent") && !type.equals("vksa")) {
             throw new IllegalArgumentException("Type must be 'newsEvent' or 'vksa'");
         }
-        List<NewsEvent> events = service.getByType(type);
+        List<NewsEvent> events = service.getByType(type,role);
         return events.stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
