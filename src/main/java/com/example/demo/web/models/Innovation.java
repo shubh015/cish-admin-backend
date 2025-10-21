@@ -63,5 +63,16 @@ public class Innovation {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
+
+     // ✅ Newly added flags
+    @Column(name = "ispublished", nullable = false)
+    private Boolean ispublished = false;
+
+    @Column(name = "isactive", nullable = false)
+    private Boolean isactive = true;
+
+    @Column(name = "backtocreator", nullable = false)
+    private Boolean backtocreator = false;
+
     // getters and setters
 }

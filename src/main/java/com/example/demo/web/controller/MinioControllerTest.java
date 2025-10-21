@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/test/files")
+@RequestMapping("/files")
 @RequiredArgsConstructor
 public class MinioControllerTest {
 

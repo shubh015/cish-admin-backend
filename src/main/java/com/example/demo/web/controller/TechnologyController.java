@@ -31,7 +31,7 @@ public class TechnologyController {
      * Create a new technology
      */
     @PostMapping
-       @CrossOrigin("*")
+    @CrossOrigin("*")
     public ResponseEntity<TechnologyDto> create(@Valid @RequestBody TechnologyCreateDto dto) {
         Technology saved = technologyService.create(dto, "system"); // user hardcoded for now
         return ResponseEntity.status(HttpStatus.CREATED).body(TechnologyMapper.INSTANCE.toDto(saved));
@@ -41,7 +41,7 @@ public class TechnologyController {
      * List/search technologies
      */
     @GetMapping
-       @CrossOrigin("*")
+    @CrossOrigin("*")
     public Page<TechnologyDto> list(@RequestParam(required = false) String q,
                                     @PageableDefault(size = 20) Pageable pageable) {
         Page<Technology> page = technologyService.search(q, pageable);
@@ -52,7 +52,7 @@ public class TechnologyController {
      * Get technology by id
      */
     @GetMapping("/{id}")
-       @CrossOrigin("*")
+    @CrossOrigin("*")
     public ResponseEntity<TechnologyDto> get(@PathVariable Long id) {
         Technology t = techRepo.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));

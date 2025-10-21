@@ -4,6 +4,8 @@ package com.example.demo.web.controller;
 import com.example.demo.service.NewsEventService;
 import com.example.demo.web.models.event.NewsEvent;
 import com.example.demo.web.models.event.NewsEventResponse;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.Date;
@@ -82,5 +84,42 @@ public class NewsEventController {
                 .map(img -> img.getImageUrl())
                 .collect(Collectors.toList()));
         return res;
+    }
+
+
+
+    @PostMapping("/status")
+    @CrossOrigin("*")
+    public ResponseEntity<String> updateNewsEventStatus(@RequestBody Map<String, Object> payload) {
+        try {
+            String key = (String) payload.get("key");
+            if (key == null || !payload.containsKey("ids")) {
+                return ResponseEntity.badRequest().body("❌ Missing 'key' or 'ids' in request.");
+            }
+
+            // Convert ids safely
+            List<Long> ids = ((List<?>) payload.get("ids"))
+                    .stream()
+                    .map(id -> Long.valueOf(String.valueOf(id)))
+                    .toList();
+
+            if (ids.isEmpty()) {
+                return ResponseEntity.badRequest().body("❌ 'ids' list cannot be empty.");
+            }
+
+            switch (key.toLowerCase()) {
+                case "publish" -> service.updateStatus(ids, true, true, false);
+                case "delete" -> service.updateStatus(ids, null, false, null);
+                case "backtocreator" -> service.updateStatus(ids, false, null, true);
+                default -> {
+                    return ResponseEntity.badRequest()
+                            .body("❌ Invalid key. Use 'publish', 'delete', or 'backToCreator'.");
+                }
+            }
+
+            return ResponseEntity.ok("✅ Status updated for " + ids.size() + " record(s) with action: " + key);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("❌ Error: " + e.getMessage());
+        }
     }
 }

@@ -1,7 +1,11 @@
 package com.example.demo.service;
 
 
+import com.example.demo.web.models.Innovation;
 import com.example.demo.web.models.event.NewsEvent;
+
+import jakarta.transaction.Transactional;
+
 import com.example.demo.repository.NewsEventRepository;
 import org.springframework.stereotype.Service;
 
@@ -27,4 +31,18 @@ public class NewsEventService {
     public List<NewsEvent> getByType(String type) {
         return repo.findByType(type);
     }
+
+    @Transactional
+public void updateStatus(List<Long> ids, Boolean isPublished, Boolean isActive, Boolean backToCreator) {
+    for (Long id : ids) {
+        NewsEvent innovation = repo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Innovation not found with ID: " + id));
+
+        if (isPublished != null) innovation.setIspublished(isPublished);
+        if (isActive != null) innovation.setIsactive(isActive);
+        if (backToCreator != null) innovation.setBacktocreator(backToCreator);
+
+        repo.save(innovation);
+    }
+}
 }

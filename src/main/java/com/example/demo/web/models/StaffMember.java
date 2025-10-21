@@ -42,4 +42,15 @@ public class StaffMember {
     @JoinColumn(name = "sub_department_id")
     @JsonBackReference // ✅ Jackson will not serialize this side
     private SubDepartment subDepartment;
+
+
+       @Column(name = "ispublished", nullable = false)
+    private Boolean ispublished = false;
+
+    @Column(name = "isactive", nullable = false)
+    private Boolean isactive = true;
+
+    @Column(name = "backtocreator", nullable = false)
+    private Boolean backtocreator = false;
+
 }
