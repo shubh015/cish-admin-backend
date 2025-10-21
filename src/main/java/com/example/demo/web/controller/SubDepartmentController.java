@@ -20,6 +20,7 @@ public class SubDepartmentController {
     private final SubDepartmentService subDeptService;
 
     @PostMapping
+    @CrossOrigin("*")
     public ResponseEntity<SubDepartment> createSubDepartment(@RequestBody SubDepartment subDept) {
         // Identify "head" from employees and mark isHead=true
         if (subDept.getEmployees() != null && !subDept.getEmployees().isEmpty()) {
@@ -34,11 +35,13 @@ public class SubDepartmentController {
     }
 
     @GetMapping
+    @CrossOrigin("*")
     public ResponseEntity<List<SubDepartment>> getAll() {
         return ResponseEntity.ok(subDeptService.getAll());
     }
 
     @GetMapping("/{id}")
+    @CrossOrigin("*")
     public ResponseEntity<SubDepartment> getById(@PathVariable Integer id) {
         SubDepartment subDept = subDeptService.getById(id);
         return subDept != null ? ResponseEntity.ok(subDept) : ResponseEntity.notFound().build();

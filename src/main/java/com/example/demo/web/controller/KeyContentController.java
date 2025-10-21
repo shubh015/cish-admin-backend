@@ -11,6 +11,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/api/content")
+@CrossOrigin("*")
 public class KeyContentController {
 
     private final KeyContentService service;

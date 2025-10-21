@@ -12,6 +12,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/innovation")
+@CrossOrigin("*")
 public class InnovationController {
 
     private final InnovationService service;
@@ -22,6 +23,7 @@ public class InnovationController {
 
 
     @PostMapping
+    @CrossOrigin("*")
     public String saveInnovation(@RequestBody Map<String, List<Innovation>> payload) {
         List<Innovation> toSave = new ArrayList<>();
 
@@ -41,6 +43,7 @@ public class InnovationController {
 
 
     @GetMapping
+    @CrossOrigin("*")
     public List<Innovation> getInnovations(@RequestParam("key") String key) {
         String type;
         if (key.equalsIgnoreCase("technology")) {

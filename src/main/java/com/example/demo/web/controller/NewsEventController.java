@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/news")
+@CrossOrigin("*")
 public class NewsEventController {
 
     private final NewsEventService service;

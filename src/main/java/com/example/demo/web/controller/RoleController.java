@@ -15,6 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/roles")
+@CrossOrigin("*")
 @RequiredArgsConstructor
 public class RoleController {
 
