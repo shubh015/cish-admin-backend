@@ -74,5 +74,8 @@ public class Innovation {
     @Column(name = "backtocreator", nullable = false)
     private Boolean backtocreator = false;
 
+    @Column(name = "istrending")
+    private Boolean isTrending;
+
     // getters and setters
 }
