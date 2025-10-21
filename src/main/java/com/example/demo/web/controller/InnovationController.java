@@ -91,4 +91,9 @@ public class InnovationController {
         }
     }
 
+     @GetMapping("/ping")
+    public ResponseEntity<String> ping() {
+        return ResponseEntity.ok("API is working fine!");
+    }
+
 }
