@@ -13,6 +13,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/innovation")
 @CrossOrigin("*")
+
 public class InnovationController {
 
     private final InnovationService service;
