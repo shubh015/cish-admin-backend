@@ -44,12 +44,15 @@ public class StaffMember {
     private SubDepartment subDepartment;
 
 
-       @Column(name = "ispublished", nullable = false)
+    @Builder.Default
+    @Column(name = "ispublished", nullable = false)
     private Boolean ispublished = false;
 
+    @Builder.Default
     @Column(name = "isactive", nullable = false)
     private Boolean isactive = true;
 
+    @Builder.Default
     @Column(name = "backtocreator", nullable = false)
     private Boolean backtocreator = false;
 
