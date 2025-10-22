@@ -20,6 +20,8 @@ public class SubDepartment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String department;
+
     private String subDeptId;
     private String subDeptName;
 

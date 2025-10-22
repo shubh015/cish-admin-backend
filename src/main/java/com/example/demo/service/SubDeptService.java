@@ -20,8 +20,8 @@ public class SubDeptService {
     private final SubDepartmentRepository subDeptRepo;
     private final StaffMemberRepository staffRepo;
 
-    public SubDepartment findBySubDeptId(String subDeptId) {
-        return subDeptRepo.findBySubDeptId(subDeptId).orElse(null);
+    public SubDepartment findBySubDeptId(String subDeptId, String department) {
+        return subDeptRepo.findBySubDeptIdAndDepartment(subDeptId,department).orElse(null);
     }
 
     public SubDepartment saveSubDepartment(SubDepartment subDept) {
@@ -32,8 +32,17 @@ public class SubDeptService {
         staffRepo.saveAll(employees);
     }
 
-    public List<SubDepartment> getAll() {
-        return subDeptRepo.findAll();
+    public List<SubDepartment> getAll(String department, String role) {
+        if(department == null || department.isEmpty()){
+            return subDeptRepo.findAll();
+        }
+        if(role != null ){
+            if(role.equalsIgnoreCase("admin"))
+               return subDeptRepo.findByDepartmentWithcreatedEmployees(department);
+            if(role.equalsIgnoreCase("creator"))
+                return subDeptRepo.findByDepartmentWithBacktoCreatedEmployees(department);     
+        }
+        return subDeptRepo.findByDepartmentWithActivePublishedEmployees(department);
     }
 
     public SubDepartment getById(Long id) {
@@ -56,4 +65,16 @@ public class SubDeptService {
             staffRepo.save(innovation);
         }
     }
+
+
+
+
+    public StaffMember findStaffById(Integer id) {
+    return staffRepo.findById(id.longValue()).orElseThrow(() -> new RuntimeException("Staff not found"));
+}
+
+public void saveEmployee(StaffMember emp) {
+    staffRepo.save(emp);
+}
+
 }

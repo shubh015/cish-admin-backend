@@ -1,6 +1,5 @@
 package com.example.demo.web.models.content;
 
-
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
@@ -32,16 +31,16 @@ public class KeyContent {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-@Builder.Default
-@Column(name = "ispublished", nullable = false)
-private Boolean ispublished = false;
+    @Builder.Default
+    @Column(name = "ispublished", nullable = false)
+    private Boolean ispublished = false;
 
-@Builder.Default
-@Column(name = "isactive", nullable = false)
-private Boolean isactive = true;
+    @Builder.Default
+    @Column(name = "isactive", nullable = false)
+    private Boolean isactive = true;
 
-@Builder.Default
-@Column(name = "backtocreator", nullable = false)
-private Boolean backtocreator = false;
+    @Builder.Default
+    @Column(name = "backtocreator", nullable = false)
+    private Boolean backtocreator = false;
 
 }
