@@ -80,5 +80,13 @@ public class Innovation {
     @Column(name = "istrending")
     private Boolean isTrending;
 
+
+      @Column(name = "is_nutra")
+    private Boolean isNutra;
+
+
+      @Column(name = "climate_risiliant")
+    private Boolean isClimateResilient;
+
     // getters and setters
 }
