@@ -1,15 +1,19 @@
 package com.example.demo.web.models;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -52,7 +56,16 @@ public class Innovation {
     private String licenseDuration;
     private String licensingTerritory;
     private String licenseFee;
-    private String targetCustomers;
+
+
+// ✅ targetCustomers is now a list instead of a single string
+    @ElementCollection
+    @CollectionTable(
+        name = "innovation_target_customers",
+        joinColumns = @JoinColumn(name = "innovation_id")
+    )
+    @Column(name = "target_customer")
+    private List<String> targetCustomers;
     private String royalty;
 
     @Column(name = "created_at", updatable = false)
@@ -82,11 +95,16 @@ public class Innovation {
 
 
       @Column(name = "is_nutra")
-    private Boolean isNutra;
+    private Boolean isNutraceutical;
 
 
       @Column(name = "climate_risiliant")
     private Boolean isClimateResilient;
+
+
+    @Column(name = "is_varieties")
+    private Boolean isVarieties;
+            
 
     // getters and setters
 }
