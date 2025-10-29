@@ -1,8 +1,5 @@
 
 
-ALTER TABLE public.innovation
-ALTER COLUMN target_customers TYPE text[];
-
 -- === 2. Add is_varieties column if not already present ===
 DO $$
 BEGIN
