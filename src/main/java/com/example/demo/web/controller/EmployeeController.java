@@ -37,7 +37,8 @@ public class EmployeeController {
     public ResponseEntity<List<Employee>> getEmployees(
             @RequestParam(required = false) Boolean isDirector,
             @RequestParam(required = false) String subDeptId,
-            @RequestParam(required = false) String division) {
-        return ResponseEntity.ok(service.getEmployees(isDirector, subDeptId, division));
+            @RequestParam(required = false) String division,
+             @RequestParam(value = "role", required = false) String role) {
+        return ResponseEntity.ok(service.getEmployees(isDirector, subDeptId, division,role));
     }
 }

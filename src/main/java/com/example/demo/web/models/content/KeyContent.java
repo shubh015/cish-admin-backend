@@ -28,6 +28,8 @@ public class KeyContent {
     private LocalDate postDate;
     private LocalDate lastDate;
 
+    private String link;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 

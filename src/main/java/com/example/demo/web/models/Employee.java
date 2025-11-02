@@ -1,7 +1,5 @@
 package com.example.demo.web.models;
 
-
-
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -40,4 +38,17 @@ public class Employee {
 
     @Column(length = 1000)
     private String descriptionDirector;
+
+    @Builder.Default
+    @Column(name = "ispublished", nullable = false)
+    private Boolean isPublished = false;
+
+    @Builder.Default
+    @Column(name = "isactive", nullable = false)
+    private Boolean isActive = true;
+
+    @Builder.Default
+    @Column(name = "backtocreator", nullable = false)
+    private Boolean backToCreator = false;
+
 }

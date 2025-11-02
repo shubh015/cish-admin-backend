@@ -37,6 +37,7 @@ public class KeyContentController {
                     .title((String) item.get("title"))
                     .description((String) item.get("description"))
                     .imageUrl((String) item.get("images"))
+                    .link((String) item.get("link"))
                     .date(item.get("date") != null ? LocalDate.parse((String) item.get("date"), formatter) : null)
                     .postDate(item.get("postDate") != null ? LocalDate.parse((String) item.get("postDate"), formatter)
                             : null)

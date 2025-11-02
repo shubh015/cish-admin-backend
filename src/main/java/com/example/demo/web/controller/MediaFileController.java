@@ -1,5 +1,6 @@
 package com.example.demo.web.controller;
 
+import java.sql.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -17,7 +18,6 @@ import com.example.demo.service.MediaFileService;
 import com.example.demo.web.models.media.MediaFile;
 
 import lombok.RequiredArgsConstructor;
-
 @RestController
 @CrossOrigin("*")
 @RequestMapping("/media")
@@ -26,31 +26,50 @@ public class MediaFileController {
 
     private final MediaFileService service;
 
-    // ✅ Save API
     @PostMapping("/save")
     @CrossOrigin("*")
-    public String saveMedia(@RequestBody Map<String, List<Map<String, String>>> payload) {
+    public String saveMedia(@RequestBody Map<String, Object> payload) {
+
+        String title = (String) payload.get("title");
+        String publishDateStr = (String) payload.get("publishDate");
+        Date publishDate = (publishDateStr != null) ? Date.valueOf(publishDateStr) : null;
+
+        // 🧩 Handle image uploads
         if (payload.containsKey("isImage")) {
-            List<String> imageUrls = payload.get("isImage").stream()
-                    .map(item -> item.get("images"))
+            List<Map<String, Object>> imageList = (List<Map<String, Object>>) payload.get("isImage");
+            List<MediaFile> imageFiles = imageList.stream()
+                    .map(item -> MediaFile.builder()
+                            .type("image")
+                            .url((String) item.get("url"))
+                            .thumbnail(Boolean.TRUE.equals(item.get("thumbnail")))
+                            .title(title)
+                            .publishDate(publishDate)
+                            .build())
                     .collect(Collectors.toList());
-            service.saveMedia("image", imageUrls);
+            service.saveAll(imageFiles);
         }
 
+        // 🎥 Handle video uploads
         if (payload.containsKey("isVideo")) {
-            List<String> videoUrls = payload.get("isVideo").stream()
-                    .map(item -> item.get("video"))
+            List<Map<String, Object>> videoList = (List<Map<String, Object>>) payload.get("isVideo");
+            List<MediaFile> videoFiles = videoList.stream()
+                    .map(item -> MediaFile.builder()
+                            .type("video")
+                            .url((String) item.get("url"))
+                            .thumbnail(Boolean.TRUE.equals(item.get("thumbnail")))
+                            .title(title)
+                            .publishDate(publishDate)
+                            .build())
                     .collect(Collectors.toList());
-            service.saveMedia("video", videoUrls);
+            service.saveAll(videoFiles);
         }
 
-        return "Media saved successfully";
+        return "✅ Media saved successfully";
     }
 
-    // ✅ Get API (filter by type)
     @GetMapping("/get/{type}")
     @CrossOrigin("*")
-    public List<MediaFile> getMedia(@PathVariable String type, @RequestParam(required = false) String role ) {
-        return service.getMedia(type,role);
+    public List<MediaFile> getMedia(@PathVariable String type, @RequestParam(required = false) String role) {
+        return service.getMedia(type, role);
     }
 }

@@ -19,6 +19,10 @@ public class MediaFileService {
         urls.forEach(url -> repository.save(MediaFile.builder().type(type).url(url).build()));
     }
 
+      public void saveAll(List<MediaFile> files) {
+        repository.saveAll(files);
+    }
+
     public List<MediaFile> getMedia(String type, String role ) {
 
               if(role != null ){

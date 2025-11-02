@@ -5,6 +5,8 @@ import lombok.Data;
 import java.util.Date;
 import java.util.List;
 
+import java.util.List;
+
 @Data
 public class NewsEventResponse {
     private Long id;
@@ -12,5 +14,16 @@ public class NewsEventResponse {
     private Date date;
     private String title;
     private String type;
-    private List<String> images;
-}   
+    private Date startDate;
+    private Date endDate;
+
+    // ✅ Each image will have both "url" and "thumbnail"
+    private List<ImageResponse> images;
+
+    @Data
+    public static class ImageResponse {
+        private String url;
+        private Boolean thumbnail;
+    }
+}
+  

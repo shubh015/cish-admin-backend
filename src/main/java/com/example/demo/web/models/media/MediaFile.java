@@ -1,9 +1,10 @@
 package com.example.demo.web.models.media;
 
 
+import java.util.Date;
+
 import jakarta.persistence.*;
 import lombok.*;
-
 @Entity
 @Table(name = "media_files")
 @Data
@@ -18,8 +19,13 @@ public class MediaFile {
 
     private String type; // image or video
     private String url;
+    private Boolean thumbnail = false;
 
-         // ✅ Newly added flags
+    private String title;
+
+    @Column(name = "publish_date")
+    private Date publishDate;
+
     @Builder.Default
     @Column(name = "ispublished", nullable = false)
     private Boolean ispublished = false;

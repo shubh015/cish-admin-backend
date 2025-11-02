@@ -25,101 +25,153 @@ public class NewsEventController {
     }
 
     // Save API for newsEvent or vksa
-    @PostMapping("/save")
-     @CrossOrigin("*")
-    public Object saveNews(@RequestBody Map<String, Object> request) {
-        if (request.containsKey("newsEvent")) {
-            Map<String, Object> newsMap = (Map<String, Object>) request.get("newsEvent");
-            NewsEvent event = mapToEntity(newsMap, "newsEvent");
-            return service.save(event);
-        } else if (request.containsKey("vksa")) {
-            List<Map<String, Object>> list = (List<Map<String, Object>>) request.get("vksa");
-            List<NewsEvent> events = list.stream()
-                    .map(m -> mapToEntity(m, "vksa"))
-                    .collect(Collectors.toList());
-            return service.saveAll(events);
-        } else {
-            throw new IllegalArgumentException("Invalid payload: expected 'newsEvent' or 'vksa'");
-        }
-    }
+@PostMapping("/save")
+@CrossOrigin("*")
+public Object saveNews(@RequestBody Map<String, Object> request) {
 
-    // GET API by type, returns clean JSON
-    @GetMapping
-     @CrossOrigin("*")
-    public List<NewsEventResponse> getByType(@RequestParam String type, @RequestParam(required = false) String role) {
-        if (!type.equals("newsEvent") && !type.equals("vksa")) {
-            throw new IllegalArgumentException("Type must be 'newsEvent' or 'vksa'");
-        }
-        List<NewsEvent> events = service.getByType(type,role);
-        return events.stream()
-                .map(this::mapToResponse)
-                .collect(Collectors.toList());
-    }
+    if (request.containsKey("newsEvent")) {
+        Map<String, Object> newsMap = (Map<String, Object>) request.get("newsEvent");
 
-    // Payload → Entity mapper
-    private NewsEvent mapToEntity(Map<String, Object> map, String type) {
-        NewsEvent e = new NewsEvent();
-        e.setName((String) map.get("name"));
-        e.setTitle((String) map.get("title"));
-        e.setDate(Date.valueOf((String) map.get("date")));
-        e.setType(type);
+        NewsEvent event = new NewsEvent();
+        event.setName((String) newsMap.get("name"));
+        event.setTitle((String) newsMap.get("title"));
+        event.setType("newsEvent");
 
-        List<String> images = (List<String>) map.get("images");
+        // parse dates safely
+        event.setDate(java.sql.Date.valueOf((String) newsMap.get("date")));
+        event.setStartDate(java.sql.Date.valueOf((String) newsMap.get("startDate")));
+        event.setEndDate(java.sql.Date.valueOf((String) newsMap.get("endDate")));
+
+        // handle images
+        List<Map<String, Object>> images = (List<Map<String, Object>>) newsMap.get("images");
         if (images != null) {
-            images.forEach(e::addImage);
+            for (Map<String, Object> img : images) {
+                String url = (String) img.get("url");
+                boolean thumbnail = Boolean.TRUE.equals(img.get("thumbnail"));
+                event.addImage(url, thumbnail);
+            }
         }
 
-        return e;
+        return service.save(event);
+
+    } else if (request.containsKey("vksa")) {
+        List<Map<String, Object>> list = (List<Map<String, Object>>) request.get("vksa");
+        List<NewsEvent> events = list.stream().map(m -> {
+            NewsEvent e = new NewsEvent();
+            e.setName((String) m.get("name"));
+            e.setTitle((String) m.get("title"));
+            e.setType("vksa");
+            e.setDate(java.sql.Date.valueOf((String) m.get("date")));
+            return e;
+        }).collect(Collectors.toList());
+
+        return service.saveAll(events);
+    } else {
+        throw new IllegalArgumentException("Invalid payload: expected 'newsEvent' or 'vksa'");
     }
+}
 
-    // Entity → DTO mapper
-    private NewsEventResponse mapToResponse(NewsEvent e) {
-        NewsEventResponse res = new NewsEventResponse();
-        res.setId(e.getId());
-        res.setName(e.getName());
-        res.setTitle(e.getTitle());
-        res.setDate(e.getDate());
-        res.setType(e.getType());
-        res.setImages(e.getImages().stream()
-                .map(img -> img.getImageUrl())
-                .collect(Collectors.toList()));
-        return res;
+
+   // GET API by type, returns clean JSON
+@GetMapping
+@CrossOrigin("*")
+public List<NewsEventResponse> getByType(@RequestParam String type, @RequestParam(required = false) String role) {
+    if (!type.equals("newsEvent") && !type.equals("vksa")) {
+        throw new IllegalArgumentException("Type must be 'newsEvent' or 'vksa'");
     }
+    List<NewsEvent> events = service.getByType(type, role);
+    return events.stream()
+            .map(this::mapToResponse)
+            .collect(Collectors.toList());
+}
 
+// ✅ Payload → Entity mapper (updated to handle startDate, endDate, and image objects)
+@SuppressWarnings("unchecked")
+private NewsEvent mapToEntity(Map<String, Object> map, String type) {
+    NewsEvent e = new NewsEvent();
+    e.setName((String) map.get("name"));
+    e.setTitle((String) map.get("title"));
+    e.setType(type);
 
+    // ✅ safely convert date strings to SQL Date
+    if (map.get("date") != null)
+        e.setDate(Date.valueOf((String) map.get("date")));
+    if (map.get("startDate") != null)
+        e.setStartDate(Date.valueOf((String) map.get("startDate")));
+    if (map.get("endDate") != null)
+        e.setEndDate(Date.valueOf((String) map.get("endDate")));
 
-    @PostMapping("/status")
-    @CrossOrigin("*")
-    public ResponseEntity<String> updateNewsEventStatus(@RequestBody Map<String, Object> payload) {
-        try {
-            String key = (String) payload.get("key");
-            if (key == null || !payload.containsKey("ids")) {
-                return ResponseEntity.badRequest().body("❌ Missing 'key' or 'ids' in request.");
-            }
-
-            // Convert ids safely
-            List<Long> ids = ((List<?>) payload.get("ids"))
-                    .stream()
-                    .map(id -> Long.valueOf(String.valueOf(id)))
-                    .toList();
-
-            if (ids.isEmpty()) {
-                return ResponseEntity.badRequest().body("❌ 'ids' list cannot be empty.");
-            }
-
-            switch (key.toLowerCase()) {
-                case "publish" -> service.updateStatus(ids, true, true, false);
-                case "delete" -> service.updateStatus(ids, null, false, null);
-                case "backtocreator" -> service.updateStatus(ids, false, null, true);
-                default -> {
-                    return ResponseEntity.badRequest()
-                            .body("❌ Invalid key. Use 'publish', 'delete', or 'backToCreator'.");
-                }
-            }
-
-            return ResponseEntity.ok("✅ Status updated for " + ids.size() + " record(s) with action: " + key);
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("❌ Error: " + e.getMessage());
+    // ✅ handle list of image objects (with "url" and "thumbnail")
+    List<Map<String, Object>> imageList = (List<Map<String, Object>>) map.get("images");
+    if (imageList != null) {
+        for (Map<String, Object> img : imageList) {
+            String url = (String) img.get("url");
+            boolean thumbnail = Boolean.TRUE.equals(img.get("thumbnail"));
+            e.addImage(url, thumbnail);
         }
     }
+
+    return e;
+}
+
+private NewsEventResponse mapToResponse(NewsEvent e) {
+    NewsEventResponse res = new NewsEventResponse();
+    res.setId(e.getId());
+    res.setName(e.getName());
+    res.setTitle(e.getTitle());
+    res.setDate(e.getDate());
+    res.setStartDate(e.getStartDate());
+    res.setEndDate(e.getEndDate());
+    res.setType(e.getType());
+
+    // ✅ Map both URL and thumbnail flag into ImageResponse objects
+    List<NewsEventResponse.ImageResponse> imageResponses = e.getImages().stream()
+            .map(img -> {
+                NewsEventResponse.ImageResponse ir = new NewsEventResponse.ImageResponse();
+                ir.setUrl(img.getImageUrl());
+                ir.setThumbnail(img.getThumbnail());
+                return ir;
+            })
+            .collect(Collectors.toList());
+
+    res.setImages(imageResponses);
+
+    return res;
+}
+
+
+// No change needed for the /status endpoint
+@PostMapping("/status")
+@CrossOrigin("*")
+public ResponseEntity<String> updateNewsEventStatus(@RequestBody Map<String, Object> payload) {
+    try {
+        String key = (String) payload.get("key");
+        if (key == null || !payload.containsKey("ids")) {
+            return ResponseEntity.badRequest().body("❌ Missing 'key' or 'ids' in request.");
+        }
+
+        List<Long> ids = ((List<?>) payload.get("ids"))
+                .stream()
+                .map(id -> Long.valueOf(String.valueOf(id)))
+                .toList();
+
+        if (ids.isEmpty()) {
+            return ResponseEntity.badRequest().body("❌ 'ids' list cannot be empty.");
+        }
+
+        switch (key.toLowerCase()) {
+            case "publish" -> service.updateStatus(ids, true, true, false);
+            case "delete" -> service.updateStatus(ids, null, false, null);
+            case "backtocreator" -> service.updateStatus(ids, false, null, true);
+            default -> {
+                return ResponseEntity.badRequest()
+                        .body("❌ Invalid key. Use 'publish', 'delete', or 'backToCreator'.");
+            }
+        }
+
+        return ResponseEntity.ok("✅ Status updated for " + ids.size() + " record(s) with action: " + key);
+    } catch (Exception e) {
+        return ResponseEntity.internalServerError().body("❌ Error: " + e.getMessage());
+    }
+}
 }

@@ -19,7 +19,15 @@ public class EmployeeService {
         return repository.saveAll(employees);
     }
 
-    public List<Employee> getEmployees(Boolean isDirector, String subDeptId, String division) {
-        return repository.findByFilters(isDirector, subDeptId, division);
+    public List<Employee> getEmployees(Boolean isDirector, String subDeptId, String division, String role) {
+
+        if(role != null ){
+            if(role.equalsIgnoreCase("admin"))
+               return repository.findByFiltersAndIspublishedFalseAndIsactiveTrue(isDirector, subDeptId, division);
+            if(role.equalsIgnoreCase("creator"))
+                return repository.findByFiltersAndBacktocreatorTrue(isDirector, subDeptId, division);     
+        }
+
+        return repository.findByFiltersIspublishedTrueAndIsactiveTrue(isDirector, subDeptId, division);
     }
 }
