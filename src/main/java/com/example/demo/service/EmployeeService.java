@@ -1,13 +1,14 @@
 package com.example.demo.service;
 
-import lombok.RequiredArgsConstructor;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 
 import com.example.demo.repository.EmployeeRepository;
 import com.example.demo.web.models.Employee;
 
-import java.util.List;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -30,4 +31,19 @@ public class EmployeeService {
 
         return repository.findByFiltersIspublishedTrueAndIsactiveTrue(isDirector, subDeptId, division);
     }
+
+
+      @Transactional
+public void updateStatus(List<Long> ids, Boolean isPublished, Boolean isActive, Boolean backToCreator) {
+    for (Long id : ids) {
+        Employee emp = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Innovation not found with ID: " + id));
+
+        if (isPublished != null) emp.setIsPublished(isPublished);;
+        if (isActive != null) emp.setIsActive(isActive);
+        if (backToCreator != null) emp.setBackToCreator(backToCreator);
+
+        repository.save(emp);
+    }
+}
 }

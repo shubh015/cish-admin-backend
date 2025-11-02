@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -71,5 +72,42 @@ public class MediaFileController {
     @CrossOrigin("*")
     public List<MediaFile> getMedia(@PathVariable String type, @RequestParam(required = false) String role) {
         return service.getMedia(type, role);
+    }
+
+
+
+        @PostMapping("/status")
+    @CrossOrigin("*")
+    public ResponseEntity<String> updateKeyContentStatus(@RequestBody Map<String, Object> payload) {
+        try {
+            String key = (String) payload.get("key");
+            if (key == null || !payload.containsKey("ids")) {
+                return ResponseEntity.badRequest().body("❌ Missing 'key' or 'ids' in request.");
+            }
+
+            // ✅ Safely convert ids to List<Long>
+            List<Long> ids = ((List<?>) payload.get("ids"))
+                    .stream()
+                    .map(id -> Long.valueOf(String.valueOf(id)))
+                    .toList();
+
+            if (ids.isEmpty()) {
+                return ResponseEntity.badRequest().body("❌ 'ids' list cannot be empty.");
+            }
+
+            switch (key.toLowerCase()) {
+                case "publish" -> service.updateStatus(ids, true, true, false);
+                case "delete" -> service.updateStatus(ids, null, false, null);
+                case "backtocreator" -> service.updateStatus(ids, false, null, true);
+                default -> {
+                    return ResponseEntity.badRequest()
+                            .body("❌ Invalid key. Use 'publish', 'delete', or 'backToCreator'.");
+                }
+            }
+
+            return ResponseEntity.ok("✅ Status updated for " + ids.size() + " record(s) with action: " + key);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("❌ Error: " + e.getMessage());
+        }
     }
 }

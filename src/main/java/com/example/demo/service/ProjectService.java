@@ -2,6 +2,9 @@ package com.example.demo.service;
 
 
 import com.example.demo.web.models.HouseProject;
+
+import jakarta.transaction.Transactional;
+
 import com.example.demo.web.models.ExternalProject;
 import com.example.demo.repository.HouseProjectRepository;
 import com.example.demo.repository.ExternalProjectRepository;
@@ -44,4 +47,38 @@ public class ProjectService {
         }
         return externalRepo.findAllByIspublishedTrueAndIsactiveTrue();
     }
+
+
+      // ✅ Update House Project Status
+    @Transactional
+    public void updateHouseProjectStatus(List<Long> ids, Boolean isPublished, Boolean isActive, Boolean backToCreator) {
+        for (Long id : ids) {
+            HouseProject project = houseRepo.findById(id)
+                    .orElseThrow(() -> new RuntimeException("House Project not found with ID: " + id));
+
+            if (isPublished != null) project.setIspublished(isPublished);
+            if (isActive != null) project.setIsactive(isActive);
+            if (backToCreator != null) project.setBacktocreator(backToCreator);
+
+            houseRepo.save(project);
+        }
+    }
+
+    // ✅ Update External Project Status
+    @Transactional
+    public void updateExternalProjectStatus(List<Long> ids, Boolean isPublished, Boolean isActive, Boolean backToCreator) {
+        for (Long id : ids) {
+            ExternalProject project = externalRepo.findById(id)
+                    .orElseThrow(() -> new RuntimeException("External Project not found with ID: " + id));
+
+            if (isPublished != null) project.setIspublished(isPublished);
+            if (isActive != null) project.setIsactive(isActive);
+            if (backToCreator != null) project.setBacktocreator(backToCreator);
+
+            externalRepo.save(project);
+        }
+    }
+
+
+
 }
