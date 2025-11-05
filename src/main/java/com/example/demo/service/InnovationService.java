@@ -28,7 +28,7 @@ public class InnovationService {
             if(role.equalsIgnoreCase("admin"))
                return repository.findByTypeIgnoreCaseAndIspublishedFalseAndIsactiveTrue(type);
             if(role.equalsIgnoreCase("creator"))
-                return repository.findByTypeIgnoreCaseAndBacktocreatorTrue(type);     
+                return repository.findByTypeIgnoreCaseAndBacktocreatorTrueAndIsactiveTrue(type);     
         }
         return repository.findByTypeIgnoreCaseAndIspublishedTrueAndIsactiveTrue(type);
     }

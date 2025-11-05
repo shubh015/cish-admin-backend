@@ -15,4 +15,6 @@ public interface ExternalProjectRepository extends JpaRepository<ExternalProject
     List<ExternalProject> findAllByBacktocreatorTrue();
 
     List<ExternalProject> findAllByIspublishedTrueAndIsactiveTrue();
+
+    List<ExternalProject> findAllByBacktocreatorTrueAndIsactiveTrue();
 }

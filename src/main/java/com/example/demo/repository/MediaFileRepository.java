@@ -15,4 +15,6 @@ public interface MediaFileRepository extends JpaRepository<MediaFile, Long> {
     List<MediaFile> findByTypeIgnoreCaseAndIspublishedTrueAndIsactiveTrue(String type);
 
     List<MediaFile> findByTypeIgnoreCaseAndBacktocreatorTrue(String type);
+
+    List<MediaFile> findByTypeIgnoreCaseAndBacktocreatorTrueAndIsactiveTrue(String type);
 }

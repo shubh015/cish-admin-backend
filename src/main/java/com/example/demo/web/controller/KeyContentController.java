@@ -25,32 +25,47 @@ public class KeyContentController {
      * ✅ POST /api/content/save
      * Each request contains only one key (like keyResearch, jobs, tenders, etc.)
      */
-    @PostMapping("/save")
-     @CrossOrigin("*")
-    public String saveContent(@RequestBody Map<String, List<Map<String, Object>>> payload) {
-        if (payload.isEmpty()) {
-            return "❌ No content provided!";
-        }
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        payload.forEach((key, value) -> {
-            List<KeyContent> contents = value.stream().map(item -> KeyContent.builder()
+   @PostMapping("/save")
+@CrossOrigin("*")
+public String saveContent(@RequestBody Map<String, List<Map<String, Object>>> payload) {
+    if (payload.isEmpty()) {
+        return "❌ No content provided!";
+    }
+
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+    payload.forEach((key, value) -> {
+        List<KeyContent> contents = value.stream().map(item -> {
+
+            // Handle images — can be a List or a single String
+            String imageUrl = null;
+            Object imagesObj = item.get("images");
+            if (imagesObj instanceof List<?>) {
+                List<?> imagesList = (List<?>) imagesObj;
+                if (!imagesList.isEmpty()) {
+                    imageUrl = String.valueOf(imagesList.get(0)); // take first image
+                }
+            } else if (imagesObj instanceof String) {
+                imageUrl = (String) imagesObj;
+            }
+
+            return KeyContent.builder()
                     .title((String) item.get("title"))
                     .description((String) item.get("description"))
-                    .imageUrl((String) item.get("images"))
+                    .imageUrl(imageUrl)
                     .link((String) item.get("link"))
                     .date(item.get("date") != null ? LocalDate.parse((String) item.get("date"), formatter) : null)
-                    .postDate(item.get("postDate") != null ? LocalDate.parse((String) item.get("postDate"), formatter)
-                            : null)
-                    .lastDate(item.get("lastDate") != null ? LocalDate.parse((String) item.get("lastDate"), formatter)
-                            : null)
-                    .build())
-                    .toList();
+                    .postDate(item.get("postDate") != null ? LocalDate.parse((String) item.get("postDate"), formatter) : null)
+                    .lastDate(item.get("lastDate") != null ? LocalDate.parse((String) item.get("lastDate"), formatter) : null)
+                    .build();
+        }).toList();
 
-            service.saveContents(key, contents);
-        });
+        service.saveContents(key, contents);
+    });
 
-        return "✅ Content saved successfully!";
-    }
+    return "✅ Content saved successfully!";
+}
+
 
     /**
      * ✅ GET /api/content/{key}

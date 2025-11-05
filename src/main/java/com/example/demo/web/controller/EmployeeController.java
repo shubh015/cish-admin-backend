@@ -44,7 +44,7 @@ public class EmployeeController {
 
 
      @PostMapping("/status")
-    @CrossOrigin("*")
+     @CrossOrigin("*")
     public ResponseEntity<String> updateInnovationStatus(@RequestBody Map<String, Object> payload) {
         try {
             String key = (String) payload.get("key");

@@ -43,7 +43,7 @@ public class ProjectService {
             if(role.equalsIgnoreCase("admin"))
                return externalRepo.findAllByIspublishedFalseAndIsactiveTrue();
             if(role.equalsIgnoreCase("creator"))
-                return externalRepo.findAllByBacktocreatorTrue();     
+                return externalRepo.findAllByBacktocreatorTrueAndIsactiveTrue();     
         }
         return externalRepo.findAllByIspublishedTrueAndIsactiveTrue();
     }

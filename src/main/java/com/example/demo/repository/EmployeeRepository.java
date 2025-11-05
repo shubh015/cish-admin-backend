@@ -59,4 +59,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     List<Employee> findByFiltersIspublishedTrueAndIsactiveTrue(@Param("isDirector") Boolean isDirector,
                                                   @Param("subDeptId") String subDeptId,
                                                   @Param("division") String division);
+
+    List<Employee> findByFiltersAndBacktocreatorTrueAndIsactiveTrue(Boolean isDirector, String subDeptId,
+            String division);
 }

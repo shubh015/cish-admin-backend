@@ -14,4 +14,6 @@ public interface NewsEventRepository extends JpaRepository<NewsEvent, Long> {
     List<NewsEvent> findByTypeIgnoreCaseAndIspublishedFalseAndIsactiveTrue(String type);
     List<NewsEvent> findByTypeIgnoreCaseAndBacktocreatorTrue(String type);
 
+    List<NewsEvent> findByTypeIgnoreCaseAndBacktocreatorTrueAndIsactiveTrue(String type);
+
 }

@@ -13,5 +13,6 @@ public interface InnovationRepository extends JpaRepository<Innovation, Long> {
     List<Innovation> findByTypeIgnoreCaseAndIspublishedTrueAndIsactiveTrue(String type);
     List<Innovation> findByTypeIgnoreCaseAndIspublishedFalseAndIsactiveTrue(String type);
     List<Innovation> findByTypeIgnoreCaseAndBacktocreatorTrue(String type);
+    List<Innovation> findByTypeIgnoreCaseAndBacktocreatorTrueAndIsactiveTrue(String type);
 
 }
