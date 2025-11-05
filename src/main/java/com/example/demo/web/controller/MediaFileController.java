@@ -1,6 +1,7 @@
 package com.example.demo.web.controller;
 
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -27,46 +28,89 @@ public class MediaFileController {
 
     private final MediaFileService service;
 
-    @PostMapping("/save")
-    @CrossOrigin("*")
-    public String saveMedia(@RequestBody Map<String, Object> payload) {
+ @PostMapping("/save")
+@CrossOrigin("*")
+public String saveMedia(@RequestBody Map<String, Object> payload) {
+    String title = null;
+    Date publishDate = null;
 
-        String title = (String) payload.get("title");
-        String publishDateStr = (String) payload.get("publishDate");
-        Date publishDate = (publishDateStr != null) ? Date.valueOf(publishDateStr) : null;
+    List<MediaFile> mediaFiles = new ArrayList<>();
 
-        // 🧩 Handle image uploads
-        if (payload.containsKey("isImage")) {
-            List<Map<String, Object>> imageList = (List<Map<String, Object>>) payload.get("isImage");
-            List<MediaFile> imageFiles = imageList.stream()
-                    .map(item -> MediaFile.builder()
-                            .type("image")
-                            .url((String) item.get("url"))
-                            .thumbnail(Boolean.TRUE.equals(item.get("thumbnail")))
-                            .title(title)
-                            .publishDate(publishDate)
-                            .build())
-                    .collect(Collectors.toList());
-            service.saveAll(imageFiles);
-        }
-
-        // 🎥 Handle video uploads
-        if (payload.containsKey("isVideo")) {
-            List<Map<String, Object>> videoList = (List<Map<String, Object>>) payload.get("isVideo");
-            List<MediaFile> videoFiles = videoList.stream()
-                    .map(item -> MediaFile.builder()
-                            .type("video")
-                            .url((String) item.get("url"))
-                            .thumbnail(Boolean.TRUE.equals(item.get("thumbnail")))
-                            .title(title)
-                            .publishDate(publishDate)
-                            .build())
-                    .collect(Collectors.toList());
-            service.saveAll(videoFiles);
-        }
-
-        return "✅ Media saved successfully";
+    // 🧩 CASE 1: Handle standard payload (old format)
+    if (payload.containsKey("title")) {
+        title = (String) payload.get("title");
     }
+    if (payload.containsKey("publishDate")) {
+        String publishDateStr = (String) payload.get("publishDate");
+        publishDate = (publishDateStr != null) ? Date.valueOf(publishDateStr) : null;
+    }
+
+    // final copies for lambda access
+    final String finalTitle = title;
+    final Date finalPublishDate = publishDate;
+
+    if (payload.containsKey("isImage")) {
+        List<Map<String, Object>> imageList = (List<Map<String, Object>>) payload.get("isImage");
+        List<MediaFile> imageFiles = imageList.stream()
+                .map(item -> MediaFile.builder()
+                        .type("image")
+                        .url((String) item.get("url"))
+                        .thumbnail(Boolean.TRUE.equals(item.get("thumbnail")))
+                        .title(finalTitle)
+                        .publishDate(finalPublishDate)
+                        .build())
+                .collect(Collectors.toList());
+        mediaFiles.addAll(imageFiles);
+    }
+
+    if (payload.containsKey("isVideo")) {
+        List<Map<String, Object>> videoList = (List<Map<String, Object>>) payload.get("isVideo");
+        List<MediaFile> videoFiles = videoList.stream()
+                .map(item -> MediaFile.builder()
+                        .type("video")
+                        .url((String) item.get("url"))
+                        .thumbnail(Boolean.TRUE.equals(item.get("thumbnail")))
+                        .title(finalTitle)
+                        .publishDate(finalPublishDate)
+                        .build())
+                .collect(Collectors.toList());
+        mediaFiles.addAll(videoFiles);
+    }
+
+    // 🧩 CASE 2: Handle new "abic" structure
+    if (payload.containsKey("abic")) {
+        Map<String, Object> abic = (Map<String, Object>) payload.get("abic");
+
+        String abicTitle = (String) abic.get("title");
+        String abicName = (String) abic.get("name");
+        List<String> abicImages = (List<String>) abic.get("images");
+
+        // local finals for lambda
+        final String finalAbicTitle = abicTitle;
+        final String finalAbicName = abicName;
+
+        if (abicImages != null && !abicImages.isEmpty()) {
+            List<MediaFile> abicImageFiles = abicImages.stream()
+                    .map(url -> MediaFile.builder()
+                            .type("abic")
+                            .url(url)
+                            .thumbnail(false)
+                            .title(finalAbicTitle != null ? finalAbicTitle : finalAbicName)
+                            .publishDate(finalPublishDate)
+                            .build())
+                    .collect(Collectors.toList());
+            mediaFiles.addAll(abicImageFiles);
+        }
+    }
+
+    // ✅ Save all collected media entries
+    if (!mediaFiles.isEmpty()) {
+        service.saveAll(mediaFiles);
+    }
+
+    return "✅ Media saved successfully";
+}
+
 
     @GetMapping("/get/{type}")
     @CrossOrigin("*")
