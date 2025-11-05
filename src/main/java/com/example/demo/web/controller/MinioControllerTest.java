@@ -5,12 +5,16 @@ package com.example.demo.web.controller;
 import com.example.demo.service.MinioService;
 import io.minio.PutObjectArgs;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.HashMap;
@@ -140,4 +144,15 @@ public class MinioControllerTest {
             return ResponseEntity.internalServerError().body(Map.of("error", e.getMessage()));
         }
     }
+
+
+    @GetMapping("/proxy")
+    @CrossOrigin("*")
+public ResponseEntity<byte[]> proxyFile(@RequestParam String path) throws IOException {
+    URL url = new URL("http://13.234.154.152:9000/" + path);
+    byte[] bytes = url.openStream().readAllBytes();
+    return ResponseEntity.ok()
+        .contentType(MediaType.IMAGE_JPEG)
+        .body(bytes);
+}
 }
