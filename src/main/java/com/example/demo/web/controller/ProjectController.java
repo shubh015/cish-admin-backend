@@ -21,6 +21,7 @@ public class ProjectController {
 
     // ✅ Save API for both keys
     @PostMapping
+    @CrossOrigin("*")
     public ResponseEntity<String> saveProject(@RequestBody Map<String, Object> payload) {
         
         if (payload.containsKey("houseProject")) {
@@ -47,12 +48,14 @@ public class ProjectController {
 
     // ✅ Get All House Projects
     @GetMapping("/house")
+    @CrossOrigin("*")
     public ResponseEntity<List<HouseProject>> getAllHouseProjects(@RequestParam(value = "role", required = false) String role) {
         return ResponseEntity.ok(projectService.getAllHouseProjects(role));
     }
 
     // ✅ Get All External Projects
     @GetMapping("/external")
+    @CrossOrigin("*")
     public ResponseEntity<List<ExternalProject>> getAllExternalProjects( @RequestParam(value = "role", required = false) String role) {
         return ResponseEntity.ok(projectService.getAllExternalProjects(role));
     }

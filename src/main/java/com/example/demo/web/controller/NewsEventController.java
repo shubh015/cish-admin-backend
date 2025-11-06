@@ -24,7 +24,6 @@ public class NewsEventController {
         this.service = service;
     }
 
-    // Save API for newsEvent or vksa
 @PostMapping("/save")
 @CrossOrigin("*")
 public Object saveNews(@RequestBody Map<String, Object> request) {
@@ -56,12 +55,22 @@ public Object saveNews(@RequestBody Map<String, Object> request) {
 
     } else if (request.containsKey("vksa")) {
         List<Map<String, Object>> list = (List<Map<String, Object>>) request.get("vksa");
+
         List<NewsEvent> events = list.stream().map(m -> {
             NewsEvent e = new NewsEvent();
             e.setName((String) m.get("name"));
             e.setTitle((String) m.get("title"));
             e.setType("vksa");
             e.setDate(java.sql.Date.valueOf((String) m.get("date")));
+
+            // ✅ Handle images for vksa
+            List<String> imageUrls = (List<String>) m.get("images");
+            if (imageUrls != null) {
+                for (String url : imageUrls) {
+                    e.addImage(url, false);
+                }
+            }
+
             return e;
         }).collect(Collectors.toList());
 
