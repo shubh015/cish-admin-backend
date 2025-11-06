@@ -4,8 +4,7 @@ package com.example.demo.web.models.media;
 import java.util.Date;
 
 import jakarta.persistence.*;
-import lombok.*;
-@Entity
+import lombok.*;@Entity
 @Table(name = "media_files")
 @Data
 @NoArgsConstructor
@@ -17,7 +16,7 @@ public class MediaFile {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String type; // image or video
+    private String type; // image, video, abic, banner
     private String url;
     private Boolean thumbnail = false;
 
@@ -25,6 +24,10 @@ public class MediaFile {
 
     @Column(name = "publish_date")
     private Date publishDate;
+
+    // ✅ new banner link field
+    @Column(name = "banner_link")
+    private String bannerLink;
 
     @Builder.Default
     @Column(name = "ispublished", nullable = false)

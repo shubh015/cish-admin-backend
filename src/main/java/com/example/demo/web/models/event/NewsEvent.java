@@ -11,8 +11,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
-@Data
+import java.util.List;@Data
 @Entity
 @Table(name = "news_event")
 @Builder
@@ -27,7 +26,7 @@ public class NewsEvent {
     private String name;
     private Date date;
     private String title;
-    private String type; // newsEvent or vksa
+    private String type;
 
     @Column(name = "start_date")
     private Date startDate;
@@ -51,11 +50,17 @@ public class NewsEvent {
     @JsonManagedReference
     private List<NewsEventImage> images = new ArrayList<>();
 
-    // helper to add image
+    // existing helper
     public void addImage(String url, boolean thumbnail) {
+        addImage(url, thumbnail, false);
+    }
+
+    // ✅ new helper with banner flag
+    public void addImage(String url, boolean thumbnail, boolean banner) {
         NewsEventImage img = new NewsEventImage();
         img.setImageUrl(url);
         img.setThumbnail(thumbnail);
+        img.setBanner(banner);
         img.setNewsEvent(this);
         images.add(img);
     }

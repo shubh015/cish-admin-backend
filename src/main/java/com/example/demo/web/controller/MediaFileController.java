@@ -28,12 +28,11 @@ public class MediaFileController {
 
     private final MediaFileService service;
 
- @PostMapping("/save")
+@PostMapping("/save")
 @CrossOrigin("*")
 public String saveMedia(@RequestBody Map<String, Object> payload) {
     String title = null;
     Date publishDate = null;
-
     List<MediaFile> mediaFiles = new ArrayList<>();
 
     // 🧩 CASE 1: Handle standard payload (old format)
@@ -45,10 +44,11 @@ public String saveMedia(@RequestBody Map<String, Object> payload) {
         publishDate = (publishDateStr != null) ? Date.valueOf(publishDateStr) : null;
     }
 
-    // final copies for lambda access
+    // final copies for lambdas
     final String finalTitle = title;
     final Date finalPublishDate = publishDate;
 
+    // 🖼️ Handle Images
     if (payload.containsKey("isImage")) {
         List<Map<String, Object>> imageList = (List<Map<String, Object>>) payload.get("isImage");
         List<MediaFile> imageFiles = imageList.stream()
@@ -63,6 +63,7 @@ public String saveMedia(@RequestBody Map<String, Object> payload) {
         mediaFiles.addAll(imageFiles);
     }
 
+    // 🎥 Handle Videos
     if (payload.containsKey("isVideo")) {
         List<Map<String, Object>> videoList = (List<Map<String, Object>>) payload.get("isVideo");
         List<MediaFile> videoFiles = videoList.stream()
@@ -77,7 +78,7 @@ public String saveMedia(@RequestBody Map<String, Object> payload) {
         mediaFiles.addAll(videoFiles);
     }
 
-    // 🧩 CASE 2: Handle new "abic" structure
+    // 🧩 Handle ABIC block
     if (payload.containsKey("abic")) {
         Map<String, Object> abic = (Map<String, Object>) payload.get("abic");
 
@@ -85,7 +86,6 @@ public String saveMedia(@RequestBody Map<String, Object> payload) {
         String abicName = (String) abic.get("name");
         List<String> abicImages = (List<String>) abic.get("images");
 
-        // local finals for lambda
         final String finalAbicTitle = abicTitle;
         final String finalAbicName = abicName;
 
@@ -101,6 +101,22 @@ public String saveMedia(@RequestBody Map<String, Object> payload) {
                     .collect(Collectors.toList());
             mediaFiles.addAll(abicImageFiles);
         }
+    }
+
+    // 🏁 ✅ NEW: Handle Banner entries
+    if (payload.containsKey("isBanner")) {
+        List<Map<String, Object>> bannerList = (List<Map<String, Object>>) payload.get("isBanner");
+        List<MediaFile> bannerFiles = bannerList.stream()
+                .map(item -> MediaFile.builder()
+                        .type("banner")
+                        .url((String) item.get("url"))
+                        .bannerLink((String) item.get("bannerLink"))
+                        .thumbnail(false)
+                        .title(finalTitle)
+                        .publishDate(finalPublishDate)
+                        .build())
+                .collect(Collectors.toList());
+        mediaFiles.addAll(bannerFiles);
     }
 
     // ✅ Save all collected media entries

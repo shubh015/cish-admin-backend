@@ -23,7 +23,6 @@ public class NewsEventController {
     public NewsEventController(NewsEventService service) {
         this.service = service;
     }
-
 @PostMapping("/save")
 @CrossOrigin("*")
 public Object saveNews(@RequestBody Map<String, Object> request) {
@@ -36,18 +35,22 @@ public Object saveNews(@RequestBody Map<String, Object> request) {
         event.setTitle((String) newsMap.get("title"));
         event.setType("newsEvent");
 
-        // parse dates safely
-        event.setDate(java.sql.Date.valueOf((String) newsMap.get("date")));
-        event.setStartDate(java.sql.Date.valueOf((String) newsMap.get("startDate")));
-        event.setEndDate(java.sql.Date.valueOf((String) newsMap.get("endDate")));
+        // ✅ safely parse nullable dates
+        if (newsMap.get("date") != null)
+            event.setDate(java.sql.Date.valueOf((String) newsMap.get("date")));
+        if (newsMap.get("startDate") != null)
+            event.setStartDate(java.sql.Date.valueOf((String) newsMap.get("startDate")));
+        if (newsMap.get("endDate") != null)
+            event.setEndDate(java.sql.Date.valueOf((String) newsMap.get("endDate")));
 
-        // handle images
+        // ✅ handle images (with banner support)
         List<Map<String, Object>> images = (List<Map<String, Object>>) newsMap.get("images");
         if (images != null) {
             for (Map<String, Object> img : images) {
                 String url = (String) img.get("url");
                 boolean thumbnail = Boolean.TRUE.equals(img.get("thumbnail"));
-                event.addImage(url, thumbnail);
+                boolean banner = Boolean.TRUE.equals(img.get("banner"));
+                event.addImage(url, thumbnail, banner);
             }
         }
 
@@ -61,13 +64,18 @@ public Object saveNews(@RequestBody Map<String, Object> request) {
             e.setName((String) m.get("name"));
             e.setTitle((String) m.get("title"));
             e.setType("vksa");
-            e.setDate(java.sql.Date.valueOf((String) m.get("date")));
 
-            // ✅ Handle images for vksa
-            List<String> imageUrls = (List<String>) m.get("images");
-            if (imageUrls != null) {
-                for (String url : imageUrls) {
-                    e.addImage(url, false);
+            if (m.get("date") != null)
+                e.setDate(java.sql.Date.valueOf((String) m.get("date")));
+
+            // ✅ handle images (with banner)
+            List<Map<String, Object>> images = (List<Map<String, Object>>) m.get("images");
+            if (images != null) {
+                for (Map<String, Object> img : images) {
+                    String url = (String) img.get("url");
+                    boolean thumbnail = Boolean.TRUE.equals(img.get("thumbnail"));
+                    boolean banner = Boolean.TRUE.equals(img.get("banner"));
+                    e.addImage(url, thumbnail, banner);
                 }
             }
 

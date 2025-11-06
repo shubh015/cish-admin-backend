@@ -14,16 +14,19 @@ public class NewsEventImage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // ✅ Rename this column to match JSON key “url”
     @Column(name = "image_url", nullable = false)
     private String imageUrl;
 
-    // ✅ Add this new field to handle the "thumbnail" flag
     @Column(name = "thumbnail", nullable = false)
     private Boolean thumbnail = false;
+
+    // ✅ New banner column
+    @Column(name = "banner", nullable = false)
+    private Boolean banner = false;
 
     @ManyToOne
     @JoinColumn(name = "news_event_id")
     @JsonBackReference
     private NewsEvent newsEvent;
 }
+
