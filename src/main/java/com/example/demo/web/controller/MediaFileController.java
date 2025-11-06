@@ -112,6 +112,7 @@ public String saveMedia(@RequestBody Map<String, Object> payload) {
                         .url((String) item.get("url"))
                         .bannerLink((String) item.get("bannerLink"))
                         .thumbnail(false)
+                        .isBannerFirst((Boolean) item.get("isBannerFirst"))
                         .title(finalTitle)
                         .publishDate(finalPublishDate)
                         .build())

@@ -29,6 +29,9 @@ public class MediaFile {
     @Column(name = "banner_link")
     private String bannerLink;
 
+      @Column(name = "isbanner_first")
+    private Boolean isBannerFirst;
+
     @Builder.Default
     @Column(name = "ispublished", nullable = false)
     private Boolean ispublished = false;
