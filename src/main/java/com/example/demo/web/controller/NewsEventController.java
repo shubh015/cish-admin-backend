@@ -35,7 +35,6 @@ public Object saveNews(@RequestBody Map<String, Object> request) {
         event.setTitle((String) newsMap.get("title"));
         event.setType("newsEvent");
 
-        // ✅ safely parse nullable dates
         if (newsMap.get("date") != null)
             event.setDate(java.sql.Date.valueOf((String) newsMap.get("date")));
         if (newsMap.get("startDate") != null)
@@ -43,14 +42,21 @@ public Object saveNews(@RequestBody Map<String, Object> request) {
         if (newsMap.get("endDate") != null)
             event.setEndDate(java.sql.Date.valueOf((String) newsMap.get("endDate")));
 
-        // ✅ handle images (with banner support)
-        List<Map<String, Object>> images = (List<Map<String, Object>>) newsMap.get("images");
-        if (images != null) {
-            for (Map<String, Object> img : images) {
-                String url = (String) img.get("url");
-                boolean thumbnail = Boolean.TRUE.equals(img.get("thumbnail"));
-                boolean banner = Boolean.TRUE.equals(img.get("banner"));
-                event.addImage(url, thumbnail, banner);
+        // ✅ handle images flexibly
+        Object imagesObj = newsMap.get("images");
+        if (imagesObj instanceof List<?>) {
+            List<?> imagesList = (List<?>) imagesObj;
+            for (Object img : imagesList) {
+                if (img instanceof Map) {
+                    Map<String, Object> imgMap = (Map<String, Object>) img;
+                    String url = (String) imgMap.get("url");
+                    boolean thumbnail = Boolean.TRUE.equals(imgMap.get("thumbnail"));
+                    boolean banner = Boolean.TRUE.equals(imgMap.get("banner"));
+                    event.addImage(url, thumbnail, banner);
+                } else if (img instanceof String) {
+                    // If image is just a URL string
+                    event.addImage((String) img, false, false);
+                }
             }
         }
 
@@ -68,14 +74,21 @@ public Object saveNews(@RequestBody Map<String, Object> request) {
             if (m.get("date") != null)
                 e.setDate(java.sql.Date.valueOf((String) m.get("date")));
 
-            // ✅ handle images (with banner)
-            List<Map<String, Object>> images = (List<Map<String, Object>>) m.get("images");
-            if (images != null) {
-                for (Map<String, Object> img : images) {
-                    String url = (String) img.get("url");
-                    boolean thumbnail = Boolean.TRUE.equals(img.get("thumbnail"));
-                    boolean banner = Boolean.TRUE.equals(img.get("banner"));
-                    e.addImage(url, thumbnail, banner);
+            // ✅ handle images flexibly
+            Object imagesObj = m.get("images");
+            if (imagesObj instanceof List<?>) {
+                List<?> imagesList = (List<?>) imagesObj;
+                for (Object img : imagesList) {
+                    if (img instanceof Map) {
+                        Map<String, Object> imgMap = (Map<String, Object>) img;
+                        String url = (String) imgMap.get("url");
+                        boolean thumbnail = Boolean.TRUE.equals(imgMap.get("thumbnail"));
+                        boolean banner = Boolean.TRUE.equals(imgMap.get("banner"));
+                        e.addImage(url, thumbnail, banner);
+                    } else if (img instanceof String) {
+                        // If image is just a URL string
+                        e.addImage((String) img, false, false);
+                    }
                 }
             }
 
