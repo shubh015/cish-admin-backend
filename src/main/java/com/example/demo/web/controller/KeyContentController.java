@@ -49,10 +49,25 @@ public String saveContent(@RequestBody Map<String, List<Map<String, Object>>> pa
                 imageUrl = (String) imagesObj;
             }
 
+              // 📄 Handle resultDocuments (convert list to JSON or comma-separated)
+            String resultDocumentsStr = null;
+            Object resultDocsObj = item.get("resultDocuments");
+            if (resultDocsObj instanceof List<?>) {
+                List<?> docList = (List<?>) resultDocsObj;
+                if (!docList.isEmpty()) {
+                    resultDocumentsStr = String.join(",", docList.stream()
+                            .map(Object::toString)
+                            .toList());
+                }
+            } else if (resultDocsObj instanceof String) {
+                resultDocumentsStr = (String) resultDocsObj;
+            }
+
             return KeyContent.builder()
                     .title((String) item.get("title"))
                     .description((String) item.get("description"))
                     .imageUrl(imageUrl)
+                    .resultDocuments(resultDocumentsStr)
                     .link((String) item.get("link"))
                     .date(item.get("date") != null ? LocalDate.parse((String) item.get("date"), formatter) : null)
                     .postDate(item.get("postDate") != null ? LocalDate.parse((String) item.get("postDate"), formatter) : null)

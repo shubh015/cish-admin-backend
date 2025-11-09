@@ -30,6 +30,9 @@ public class KeyContent {
 
     private String link;
 
+     @Column(name = "result_documents", columnDefinition = "TEXT")
+    private String resultDocuments;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
