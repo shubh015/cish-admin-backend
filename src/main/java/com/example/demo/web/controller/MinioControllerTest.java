@@ -1,24 +1,19 @@
 package com.example.demo.web.controller;
 
-
-
 import com.example.demo.service.MinioService;
+import com.example.demo.web.models.FileUpload;
+import com.example.demo.repository.FileUploadRepository;
 import io.minio.PutObjectArgs;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/files")
@@ -26,8 +21,9 @@ import java.util.Map;
 public class MinioControllerTest {
 
     private final MinioService minioService;
+    private final FileUploadRepository fileUploadRepository;
 
-    // Generic upload (works with both Postman & your frontend)
+    // ✅ Upload for general use (no change)
     @PostMapping("/upload")
     @CrossOrigin("*")
     public ResponseEntity<Map<String, String>> upload(
@@ -35,74 +31,11 @@ public class MinioControllerTest {
             @RequestParam(value = "isActive", required = false) String isActive,
             @RequestParam Map<String, String> allParams) {
         try {
-            // ✅ Case 1: Proper MultipartFile (Postman or correct frontend)
             if (file != null && !file.isEmpty()) {
                 Map<String, String> result = minioService.uploadFileWithMetadata(
                         file,
                         Map.of("isActive", isActive != null ? isActive : "false")
                 );
-                return ResponseEntity.ok(result);
-            }
-
-            // ✅ Case 2: Frontend sends text or base64 instead of a real file
-            String rawFile = allParams.get("file");
-            if (rawFile == null || rawFile.isEmpty()) {
-                return ResponseEntity.badRequest().body(Map.of("error", "No file received"));
-            }
-
-            byte[] fileBytes;
-            String filename;
-            String contentType = "text/plain";
-
-            if (rawFile.startsWith("data:")) {
-                // Example: data:image/png;base64,iVBORw0KGgo...
-                String base64Data = rawFile.substring(rawFile.indexOf(",") + 1);
-                fileBytes = Base64.getDecoder().decode(base64Data);
-                filename = System.currentTimeMillis() + "_upload.png";
-                contentType = "image/png";
-            } else {
-                // Example: "[object Object]" → save as text
-                fileBytes = rawFile.getBytes(StandardCharsets.UTF_8);
-                filename = System.currentTimeMillis() + "_upload.txt";
-            }
-
-            try (InputStream is = new ByteArrayInputStream(fileBytes)) {
-                minioService.getMinioClient().putObject(
-                        PutObjectArgs.builder()
-                                .bucket(minioService.getBucketName())
-                                .object(filename)
-                                .stream(is, fileBytes.length, -1)
-                                .contentType(contentType)
-                                .userMetadata(Map.of("isActive", isActive != null ? isActive : "false"))
-                                .build()
-                );
-            }
-
-            String fileUrl = minioService.getMinioUrl() + "/" + minioService.getBucketName() + "/" + filename;
-            return ResponseEntity.ok(Map.of("fileName", filename, "fileUrl", fileUrl));
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.internalServerError().body(Map.of("error", e.getMessage()));
-        }
-    }
-
-    // Director desk upload
-    @PostMapping("/upload/director")
-    @CrossOrigin("*")
-    public ResponseEntity<Map<String, String>> uploadDirector(
-            @RequestParam(value = "file", required = false) MultipartFile file,
-            @RequestParam(value = "description", required = false) String description,
-            @RequestParam(value = "isDirector", required = false) String isDirector,
-            @RequestParam Map<String, String> allParams) {
-        try {
-            Map<String, String> metadata = new HashMap<>();
-            metadata.put("isDirector", isDirector != null ? isDirector : "true");
-            metadata.put("description", description != null ? description : "");
-
-            // ✅ Works for both file & text input
-            if (file != null && !file.isEmpty()) {
-                Map<String, String> result = minioService.uploadFileWithMetadata(file, metadata);
                 return ResponseEntity.ok(result);
             }
 
@@ -121,7 +54,7 @@ public class MinioControllerTest {
                                 .object(filename)
                                 .stream(is, fileBytes.length, -1)
                                 .contentType("text/plain")
-                                .userMetadata(metadata)
+                                .userMetadata(Map.of("isActive", isActive != null ? isActive : "false"))
                                 .build()
                 );
             }
@@ -134,25 +67,93 @@ public class MinioControllerTest {
         }
     }
 
-    // Get all files
+    // ✅ Upload Director File & Save to DB
+    @PostMapping("/upload/director")
+    @CrossOrigin("*")
+    public ResponseEntity<Map<String, String>> uploadDirector(
+            @RequestParam(value = "file", required = false) MultipartFile file,
+            @RequestParam(value = "description", required = false) String description,
+            @RequestParam(value = "isDirector", required = false) String isDirector,
+            @RequestParam Map<String, String> allParams) {
+        try {
+            Map<String, String> metadata = new HashMap<>();
+            metadata.put("isDirector", isDirector != null ? isDirector : "true");
+            metadata.put("description", description != null ? description : "");
+
+            String filename;
+            String fileUrl;
+
+            if (file != null && !file.isEmpty()) {
+                Map<String, String> result = minioService.uploadFileWithMetadata(file, metadata);
+                filename = result.get("fileName");
+                fileUrl = result.get("fileUrl");
+            } else {
+                String rawFile = allParams.get("file");
+                if (rawFile == null || rawFile.isEmpty()) {
+                    return ResponseEntity.badRequest().body(Map.of("error", "No file received"));
+                }
+
+                byte[] fileBytes = rawFile.getBytes(StandardCharsets.UTF_8);
+                filename = System.currentTimeMillis() + "_upload.txt";
+                try (InputStream is = new ByteArrayInputStream(fileBytes)) {
+                    minioService.getMinioClient().putObject(
+                            PutObjectArgs.builder()
+                                    .bucket(minioService.getBucketName())
+                                    .object(filename)
+                                    .stream(is, fileBytes.length, -1)
+                                    .contentType("text/plain")
+                                    .userMetadata(metadata)
+                                    .build()
+                    );
+                }
+
+                fileUrl = minioService.getMinioUrl() + "/" + minioService.getBucketName() + "/" + filename;
+            }
+
+            // ✅ Save metadata to DB
+            FileUpload record = FileUpload.builder()
+                    .fileName(filename)
+                    .fileUrl(fileUrl)
+                    .description(description)
+                    .isActive(true)
+                    .isDirector(Boolean.parseBoolean(isDirector))
+                    .isImage(file != null && file.getContentType() != null && file.getContentType().startsWith("image"))
+                    .isVideo(file != null && file.getContentType() != null && file.getContentType().startsWith("video"))
+                    .build();
+
+            fileUploadRepository.save(record);
+
+            return ResponseEntity.ok(Map.of(
+                    "fileName", filename,
+                    "fileUrl", fileUrl,
+                    "message", "✅ File uploaded and saved successfully!"
+            ));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    // ✅ Fetch all stored file metadata from DB
     @GetMapping("/getAll")
     @CrossOrigin("*")
-    public ResponseEntity<?> getAll() {
+    public ResponseEntity<?> getAllFilesFromDB() {
         try {
-            return ResponseEntity.ok(minioService.getAllFiles());
+            return ResponseEntity.ok(fileUploadRepository.findByIsDirector(true));
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(Map.of("error", e.getMessage()));
         }
     }
 
-
+    // ✅ Optional: Proxy images if needed
     @GetMapping("/proxy")
     @CrossOrigin("*")
-public ResponseEntity<byte[]> proxyFile(@RequestParam String path) throws IOException {
-    URL url = new URL("http://13.234.154.152:9000/" + path);
-    byte[] bytes = url.openStream().readAllBytes();
-    return ResponseEntity.ok()
-        .contentType(MediaType.IMAGE_JPEG)
-        .body(bytes);
-}
+    public ResponseEntity<byte[]> proxyFile(@RequestParam String path) throws Exception {
+        URL url = new URL("http://13.234.154.152:9000/" + path);
+        byte[] bytes = url.openStream().readAllBytes();
+        return ResponseEntity.ok()
+                .contentType(MediaType.IMAGE_JPEG)
+                .body(bytes);
+    }
 }
