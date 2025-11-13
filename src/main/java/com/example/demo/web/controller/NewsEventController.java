@@ -23,27 +23,66 @@ public class NewsEventController {
     public NewsEventController(NewsEventService service) {
         this.service = service;
     }
-@PostMapping("/save")
-@CrossOrigin("*")
-public Object saveNews(@RequestBody Map<String, Object> request) {
 
-    if (request.containsKey("newsEvent")) {
-        Map<String, Object> newsMap = (Map<String, Object>) request.get("newsEvent");
+    @PostMapping("/save")
+    @CrossOrigin("*")
+    public Object saveNews(@RequestBody Map<String, Object> request) {
 
-        NewsEvent event = new NewsEvent();
-        event.setName((String) newsMap.get("name"));
-        event.setTitle((String) newsMap.get("title"));
-        event.setType("newsEvent");
+        if (request.containsKey("newsEvent")) {
+            Map<String, Object> newsMap = (Map<String, Object>) request.get("newsEvent");
+            NewsEvent event = mapToEntity(newsMap, "newsEvent");
+            return service.save(event);
 
-        if (newsMap.get("date") != null)
-            event.setDate(java.sql.Date.valueOf((String) newsMap.get("date")));
-        if (newsMap.get("startDate") != null)
-            event.setStartDate(java.sql.Date.valueOf((String) newsMap.get("startDate")));
-        if (newsMap.get("endDate") != null)
-            event.setEndDate(java.sql.Date.valueOf((String) newsMap.get("endDate")));
+        } else if (request.containsKey("vksa")) {
+            List<Map<String, Object>> list = (List<Map<String, Object>>) request.get("vksa");
 
-        // ✅ handle images flexibly
-        Object imagesObj = newsMap.get("images");
+            List<NewsEvent> events = list.stream()
+                    .map(m -> mapToEntity(m, "vksa"))
+                    .collect(Collectors.toList());
+
+            return service.saveAll(events);
+
+        } else if (request.containsKey("abic")) {
+            Map<String, Object> abicMap = (Map<String, Object>) request.get("abic");
+            NewsEvent event = mapToEntity(abicMap, "abic");
+            return service.save(event);
+
+        } else {
+            throw new IllegalArgumentException("Invalid payload: expected 'newsEvent', 'vksa', or 'abic'");
+        }
+    }
+
+    // ✅ GET API by type, returns clean JSON
+    @GetMapping
+    @CrossOrigin("*")
+    public List<NewsEventResponse> getByType(@RequestParam String type, @RequestParam(required = false) String role) {
+        if (!type.equals("newsEvent") && !type.equals("vksa") && !type.equals("abic")) {
+            throw new IllegalArgumentException("Type must be 'newsEvent', 'vksa', or 'abic'");
+        }
+        List<NewsEvent> events = service.getByType(type, role);
+        return events.stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
+    // ✅ Payload → Entity mapper (supports date, startDate, endDate, images, abic)
+    @SuppressWarnings("unchecked")
+    private NewsEvent mapToEntity(Map<String, Object> map, String type) {
+        NewsEvent e = new NewsEvent();
+        e.setName((String) map.get("name"));
+        e.setTitle((String) map.get("title"));
+        e.setType(type);
+
+        // ✅ safely convert date strings to SQL Date
+        if (map.get("date") != null)
+            e.setDate(java.sql.Date.valueOf((String) map.get("date")));
+        if (map.get("startDate") != null)
+            e.setStartDate(java.sql.Date.valueOf((String) map.get("startDate")));
+        if (map.get("endDate") != null)
+            e.setEndDate(java.sql.Date.valueOf((String) map.get("endDate")));
+
+        // ✅ handle images flexibly (string URLs or map objects)
+        Object imagesObj = map.get("images");
         if (imagesObj instanceof List<?>) {
             List<?> imagesList = (List<?>) imagesObj;
             for (Object img : imagesList) {
@@ -52,122 +91,42 @@ public Object saveNews(@RequestBody Map<String, Object> request) {
                     String url = (String) imgMap.get("url");
                     boolean thumbnail = Boolean.TRUE.equals(imgMap.get("thumbnail"));
                     boolean banner = Boolean.TRUE.equals(imgMap.get("banner"));
-                    event.addImage(url, thumbnail, banner);
+                    e.addImage(url, thumbnail, banner);
                 } else if (img instanceof String) {
                     // If image is just a URL string
-                    event.addImage((String) img, false, false);
+                    e.addImage((String) img, false, false);
                 }
             }
         }
 
-        return service.save(event);
-
-    } else if (request.containsKey("vksa")) {
-        List<Map<String, Object>> list = (List<Map<String, Object>>) request.get("vksa");
-
-        List<NewsEvent> events = list.stream().map(m -> {
-            NewsEvent e = new NewsEvent();
-            e.setName((String) m.get("name"));
-            e.setTitle((String) m.get("title"));
-            e.setType("vksa");
-
-            if (m.get("date") != null)
-                e.setDate(java.sql.Date.valueOf((String) m.get("date")));
-
-            // ✅ handle images flexibly
-            Object imagesObj = m.get("images");
-            if (imagesObj instanceof List<?>) {
-                List<?> imagesList = (List<?>) imagesObj;
-                for (Object img : imagesList) {
-                    if (img instanceof Map) {
-                        Map<String, Object> imgMap = (Map<String, Object>) img;
-                        String url = (String) imgMap.get("url");
-                        boolean thumbnail = Boolean.TRUE.equals(imgMap.get("thumbnail"));
-                        boolean banner = Boolean.TRUE.equals(imgMap.get("banner"));
-                        e.addImage(url, thumbnail, banner);
-                    } else if (img instanceof String) {
-                        // If image is just a URL string
-                        e.addImage((String) img, false, false);
-                    }
-                }
-            }
-
-            return e;
-        }).collect(Collectors.toList());
-
-        return service.saveAll(events);
-    } else {
-        throw new IllegalArgumentException("Invalid payload: expected 'newsEvent' or 'vksa'");
-    }
-}
-
-
-   // GET API by type, returns clean JSON
-@GetMapping
-@CrossOrigin("*")
-public List<NewsEventResponse> getByType(@RequestParam String type, @RequestParam(required = false) String role) {
-    if (!type.equals("newsEvent") && !type.equals("vksa")) {
-        throw new IllegalArgumentException("Type must be 'newsEvent' or 'vksa'");
-    }
-    List<NewsEvent> events = service.getByType(type, role);
-    return events.stream()
-            .map(this::mapToResponse)
-            .collect(Collectors.toList());
-}
-
-// ✅ Payload → Entity mapper (updated to handle startDate, endDate, and image objects)
-@SuppressWarnings("unchecked")
-private NewsEvent mapToEntity(Map<String, Object> map, String type) {
-    NewsEvent e = new NewsEvent();
-    e.setName((String) map.get("name"));
-    e.setTitle((String) map.get("title"));
-    e.setType(type);
-
-    // ✅ safely convert date strings to SQL Date
-    if (map.get("date") != null)
-        e.setDate(Date.valueOf((String) map.get("date")));
-    if (map.get("startDate") != null)
-        e.setStartDate(Date.valueOf((String) map.get("startDate")));
-    if (map.get("endDate") != null)
-        e.setEndDate(Date.valueOf((String) map.get("endDate")));
-
-    // ✅ handle list of image objects (with "url" and "thumbnail")
-    List<Map<String, Object>> imageList = (List<Map<String, Object>>) map.get("images");
-    if (imageList != null) {
-        for (Map<String, Object> img : imageList) {
-            String url = (String) img.get("url");
-            boolean thumbnail = Boolean.TRUE.equals(img.get("thumbnail"));
-            e.addImage(url, thumbnail);
-        }
+        return e;
     }
 
-    return e;
-}
+    // ✅ Entity → Response mapper
+    private NewsEventResponse mapToResponse(NewsEvent e) {
+        NewsEventResponse res = new NewsEventResponse();
+        res.setId(e.getId());
+        res.setName(e.getName());
+        res.setTitle(e.getTitle());
+        res.setDate(e.getDate());
+        res.setStartDate(e.getStartDate());
+        res.setEndDate(e.getEndDate());
+        res.setType(e.getType());
 
-private NewsEventResponse mapToResponse(NewsEvent e) {
-    NewsEventResponse res = new NewsEventResponse();
-    res.setId(e.getId());
-    res.setName(e.getName());
-    res.setTitle(e.getTitle());
-    res.setDate(e.getDate());
-    res.setStartDate(e.getStartDate());
-    res.setEndDate(e.getEndDate());
-    res.setType(e.getType());
+        // ✅ Map both URL and thumbnail flag into ImageResponse objects
+        List<NewsEventResponse.ImageResponse> imageResponses = e.getImages().stream()
+                .map(img -> {
+                    NewsEventResponse.ImageResponse ir = new NewsEventResponse.ImageResponse();
+                    ir.setUrl(img.getImageUrl());
+                    ir.setThumbnail(img.getThumbnail());
+                    return ir;
+                })
+                .collect(Collectors.toList());
 
-    // ✅ Map both URL and thumbnail flag into ImageResponse objects
-    List<NewsEventResponse.ImageResponse> imageResponses = e.getImages().stream()
-            .map(img -> {
-                NewsEventResponse.ImageResponse ir = new NewsEventResponse.ImageResponse();
-                ir.setUrl(img.getImageUrl());
-                ir.setThumbnail(img.getThumbnail());
-                return ir;
-            })
-            .collect(Collectors.toList());
+        res.setImages(imageResponses);
+        return res;
+    }
 
-    res.setImages(imageResponses);
-
-    return res;
-}
 
 
 // No change needed for the /status endpoint
