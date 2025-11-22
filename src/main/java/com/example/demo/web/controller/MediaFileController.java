@@ -53,6 +53,8 @@ public String saveMedia(@RequestBody Map<String, Object> payload) {
         List<Map<String, Object>> imageList = (List<Map<String, Object>>) payload.get("isImage");
         List<MediaFile> imageFiles = imageList.stream()
                 .map(item -> MediaFile.builder()
+                         .id(item.get("id") != null ? Long.valueOf(item.get("id").toString()) : null)
+                         .backtocreator(item.get("backtocreator") != null ? Boolean.parseBoolean(item.get("backtocreator").toString()) : false) 
                         .type("image")
                         .url((String) item.get("url"))
                         .thumbnail(Boolean.TRUE.equals(item.get("thumbnail")))
@@ -68,6 +70,8 @@ public String saveMedia(@RequestBody Map<String, Object> payload) {
         List<Map<String, Object>> videoList = (List<Map<String, Object>>) payload.get("isVideo");
         List<MediaFile> videoFiles = videoList.stream()
                 .map(item -> MediaFile.builder()
+                         .id(item.get("id") != null ? Long.valueOf(item.get("id").toString()) : null)
+                         .backtocreator(item.get("backtocreator") != null ? Boolean.parseBoolean(item.get("backtocreator").toString()) : false) 
                         .type("video")
                         .url((String) item.get("url"))
                         .thumbnail(Boolean.TRUE.equals(item.get("thumbnail")))
@@ -92,11 +96,13 @@ public String saveMedia(@RequestBody Map<String, Object> payload) {
         if (abicImages != null && !abicImages.isEmpty()) {
             List<MediaFile> abicImageFiles = abicImages.stream()
                     .map(url -> MediaFile.builder()
+                             .id(abic.get("id") != null ? Long.valueOf(abic.get("id").toString()) : null)
                             .type("abic")
                             .url(url)
                             .thumbnail(false)
                             .title(finalAbicTitle != null ? finalAbicTitle : finalAbicName)
                             .publishDate(finalPublishDate)
+                             .backtocreator(abic.get("backtocreator") != null ? Boolean.parseBoolean(abic.get("backtocreator").toString()) : false)
                             .build())
                     .collect(Collectors.toList());
             mediaFiles.addAll(abicImageFiles);
@@ -108,6 +114,7 @@ public String saveMedia(@RequestBody Map<String, Object> payload) {
         List<Map<String, Object>> bannerList = (List<Map<String, Object>>) payload.get("isBanner");
         List<MediaFile> bannerFiles = bannerList.stream()
                 .map(item -> MediaFile.builder()
+                        .id(item.get("id") != null ? Long.valueOf(item.get("id").toString()) : null)
                         .type("banner")
                         .url((String) item.get("url"))
                         .bannerLink((String) item.get("bannerLink"))
@@ -115,6 +122,7 @@ public String saveMedia(@RequestBody Map<String, Object> payload) {
                         .isBannerFirst((Boolean) item.get("isBannerFirst"))
                         .title(finalTitle)
                         .publishDate(finalPublishDate)
+                        .backtocreator(item.get("backtocreator") != null ? Boolean.parseBoolean(item.get("backtocreator").toString()) : false)
                         .build())
                 .collect(Collectors.toList());
         mediaFiles.addAll(bannerFiles);

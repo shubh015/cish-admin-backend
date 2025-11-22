@@ -27,6 +27,8 @@ public class ProjectController {
         if (payload.containsKey("houseProject")) {
             Map<String, Object> data = (Map<String, Object>) payload.get("houseProject");
             HouseProject project = new HouseProject();
+            project.setId(data.get("id") != null ? Long.valueOf(data.get("id").toString()) : null);
+            project.setBacktocreator(data.get("backtocreator") != null ? Boolean.parseBoolean(data.get("backtocreator").toString()) : false);
             project.setActivityName((String) data.get("activityName"));
             project.setPrincipalInvestigator((String) data.get("principalInvestigator"));
             project.setCoPrincipalInvestigator((String) data.get("coPrincipalInvestigator"));
@@ -36,6 +38,8 @@ public class ProjectController {
         else if (payload.containsKey("ExternalProject")) {
             Map<String, Object> data = (Map<String, Object>) payload.get("ExternalProject");
             ExternalProject project = new ExternalProject();
+            project.setId(data.get("id") != null ? Long.valueOf(data.get("id").toString()) : null);
+            project.setBacktocreator(data.get("backtocreator") != null ? Boolean.parseBoolean(data.get("backtocreator").toString()) : false);
             project.setProjectTitle((String) data.get("projectTitle"));
             project.setPiOffice((String) data.get("piOffice"));
             project.setStartDate(java.time.LocalDate.parse((String) data.get("startDate")));

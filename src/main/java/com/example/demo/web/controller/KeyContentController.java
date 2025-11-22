@@ -65,11 +65,30 @@ public String saveContent(@RequestBody Map<String, List<Map<String, Object>>> pa
 
 
 
+           
+            Boolean flag = true;
+            if(item.get("backtocreator") instanceof Boolean){
+               flag = Boolean.parseBoolean( item.get("backtocreator").toString());
+            }
 
+            if(flag == false){
 
+               return KeyContent.builder()
+                    .id(item.get("id") != null ?  Long.valueOf(item.get("id").toString()) : null)
+                    .title((String) item.get("title"))
+                    .description((String) item.get("description"))
+                    .imageUrl(imageUrl)
+                    .resultDocuments(resultDocumentsStr)
+                    .link((String) item.get("link"))
+                    .date(item.get("date") != null ? LocalDate.parse((String) item.get("date"), formatter) : null)
+                    .postDate(item.get("postDate") != null ? LocalDate.parse((String) item.get("postDate"), formatter) : null)
+                    .lastDate(item.get("lastDate") != null ? LocalDate.parse((String) item.get("lastDate"), formatter) : null)
+                    .backtocreator(flag)
+                    .build(); 
+            } else{
 
-            
-            return KeyContent.builder()
+                return KeyContent.builder()
+                    .id(item.get("id") != null ? Long.valueOf(item.get("id").toString()) : null)
                     .title((String) item.get("title"))
                     .description((String) item.get("description"))
                     .imageUrl(imageUrl)
@@ -79,6 +98,7 @@ public String saveContent(@RequestBody Map<String, List<Map<String, Object>>> pa
                     .postDate(item.get("postDate") != null ? LocalDate.parse((String) item.get("postDate"), formatter) : null)
                     .lastDate(item.get("lastDate") != null ? LocalDate.parse((String) item.get("lastDate"), formatter) : null)
                     .build();
+            }  
         }).toList();
 
         service.saveContents(key, contents);
