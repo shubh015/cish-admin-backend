@@ -15,4 +15,6 @@ public interface KeyContentRepository extends JpaRepository<KeyContent, Long> {
     List<KeyContent> findByContentKeyAndBacktocreatorTrue(String type);
 
     List<KeyContent> findByContentKeyAndBacktocreatorTrueAndIsactiveTrue(String key);
+
+    List<KeyContent> findByContentKeyAndIspublishedFalseAndIsactiveTrueAndBacktocreatorFalse(String key);
 }

@@ -26,7 +26,7 @@ public class InnovationService {
     public List<Innovation> getByType(String type,String role) {
         if(role != null ){
             if(role.equalsIgnoreCase("admin"))
-               return repository.findByTypeIgnoreCaseAndIspublishedFalseAndIsactiveTrue(type);
+               return repository.findByTypeIgnoreCaseAndIspublishedFalseAndIsactiveTrueAndBacktocreatorFalse(type);
             if(role.equalsIgnoreCase("creator"))
                 return repository.findByTypeIgnoreCaseAndBacktocreatorTrueAndIsactiveTrue(type);     
         }

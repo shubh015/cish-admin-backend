@@ -29,7 +29,7 @@ public class MediaFileService {
 
               if(role != null ){
             if(role.equalsIgnoreCase("admin"))
-               return repository.findByTypeIgnoreCaseAndIspublishedFalseAndIsactiveTrue(type);
+               return repository.findByTypeIgnoreCaseAndIspublishedFalseAndIsactiveTrueAndBacktocreatorFalse(type);
             if(role.equalsIgnoreCase("creator"))
                 return repository.findByTypeIgnoreCaseAndBacktocreatorTrueAndIsactiveTrue(type);     
         }

@@ -28,7 +28,7 @@ public class KeyContentService {
 
         if(role != null ){
             if(role.equalsIgnoreCase("admin"))
-               return repository.findByContentKeyAndIspublishedFalseAndIsactiveTrue(key);
+               return repository.findByContentKeyAndIspublishedFalseAndIsactiveTrueAndBacktocreatorFalse(key);
             if(role.equalsIgnoreCase("creator"))
                 return repository.findByContentKeyAndBacktocreatorTrueAndIsactiveTrue(key);     
         }

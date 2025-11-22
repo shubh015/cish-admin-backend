@@ -41,7 +41,7 @@ public class ProjectService {
     public List<ExternalProject> getAllExternalProjects(String role) {
          if(role != null ){
             if(role.equalsIgnoreCase("admin"))
-               return externalRepo.findAllByIspublishedFalseAndIsactiveTrue();
+               return externalRepo.findAllByIspublishedFalseAndIsactiveTrueAndBacktocreatorFalse();
             if(role.equalsIgnoreCase("creator"))
                 return externalRepo.findAllByBacktocreatorTrueAndIsactiveTrue();     
         }

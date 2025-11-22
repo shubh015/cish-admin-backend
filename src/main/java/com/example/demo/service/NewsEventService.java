@@ -32,7 +32,7 @@ public class NewsEventService {
 
         if(role != null ){
             if(role.equalsIgnoreCase("admin"))
-               return repo.findByTypeIgnoreCaseAndIspublishedFalseAndIsactiveTrue(type);
+               return repo.findByTypeIgnoreCaseAndIspublishedFalseAndIsactiveTrueAndBacktocreatorFalse(type);
             if(role.equalsIgnoreCase("creator"))
                 return repo.findByTypeIgnoreCaseAndBacktocreatorTrueAndIsactiveTrue(type);     
         }

@@ -24,7 +24,7 @@ public class EmployeeService {
 
         if(role != null ){
             if(role.equalsIgnoreCase("admin"))
-               return repository.findByFiltersAndIspublishedFalseAndIsactiveTrue(isDirector, subDeptId, division);
+               return repository.findByFiltersAndIspublishedFalseAndIsactiveTrueAndBacktocreatorFalse(isDirector, subDeptId, division);
             if(role.equalsIgnoreCase("creator"))
                 return repository.findByFiltersAndBacktocreatorTrueAndIsactiveTrue(isDirector, subDeptId, division);     
         }

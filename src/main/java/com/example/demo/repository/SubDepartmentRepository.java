@@ -32,9 +32,9 @@ public interface SubDepartmentRepository extends JpaRepository<SubDepartment, Lo
         FROM SubDepartment sd
         LEFT JOIN FETCH sd.employees e
         WHERE sd.department = :department
-          AND (e.ispublished = false AND e.isactive = true)
+          AND (e.ispublished = false AND e.isactive = true AND e.backtocreator = false)
         """)
-    List<SubDepartment> findByDepartmentWithcreatedEmployees(@Param("department") String department);
+    List<SubDepartment> findByDepartmentWithcreatedEmployeesAndBacktocreatorFalse(@Param("department") String department);
 
 
 
@@ -46,5 +46,7 @@ public interface SubDepartmentRepository extends JpaRepository<SubDepartment, Lo
           AND (e.backtocreator = true)
         """)
     List<SubDepartment> findByDepartmentWithBacktoCreatedEmployees(@Param("department") String department);
+
+
 }
 

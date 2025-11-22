@@ -38,7 +38,7 @@ public class SubDeptService {
         }
         if(role != null ){
             if(role.equalsIgnoreCase("admin"))
-               return subDeptRepo.findByDepartmentWithcreatedEmployees(department);
+               return subDeptRepo.findByDepartmentWithcreatedEmployeesAndBacktocreatorFalse(department);
             if(role.equalsIgnoreCase("creator"))
                 return subDeptRepo.findByDepartmentWithBacktoCreatedEmployees(department);     
         }

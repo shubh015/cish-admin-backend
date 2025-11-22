@@ -31,9 +31,10 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
              AND (:subDeptId IS NULL OR e.subDeptId = :subDeptId)
              AND (:division IS NULL OR e.division = :division)
              AND e.isPublished = false
-             AND e.isActive = true
+             AND e.isActive = true 
+             AND e.backToCreator = false
            """)
-    List<Employee> findByFiltersAndIspublishedFalseAndIsactiveTrue(@Param("isDirector") Boolean isDirector,
+    List<Employee> findByFiltersAndIspublishedFalseAndIsactiveTrueAndBacktocreatorFalse(@Param("isDirector") Boolean isDirector,
                                                     @Param("subDeptId") String subDeptId,
                                                     @Param("division") String division);
 
@@ -75,4 +76,5 @@ List<Employee> findByFiltersAndBacktocreatorTrueAndIsactiveTrue(
         @Param("subDeptId") String subDeptId,
         @Param("division") String division);
 
+       
 }
