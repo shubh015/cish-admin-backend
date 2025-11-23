@@ -64,43 +64,66 @@ public class NewsEventController {
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
+@SuppressWarnings("unchecked")
+private NewsEvent mapToEntity(Map<String, Object> map, String type) {
 
-    // ✅ Payload → Entity mapper (supports date, startDate, endDate, images, abic)
-    @SuppressWarnings("unchecked")
-    private NewsEvent mapToEntity(Map<String, Object> map, String type) {
-        NewsEvent e = new NewsEvent();
-        e.setName((String) map.get("name"));
-        e.setTitle((String) map.get("title"));
-        e.setType(type);
+    NewsEvent e;
 
-        // ✅ safely convert date strings to SQL Date
-        if (map.get("date") != null)
-            e.setDate(java.sql.Date.valueOf((String) map.get("date")));
-        if (map.get("startDate") != null)
-            e.setStartDate(java.sql.Date.valueOf((String) map.get("startDate")));
-        if (map.get("endDate") != null)
-            e.setEndDate(java.sql.Date.valueOf((String) map.get("endDate")));
+    // ✅ 1. Check if ID exists → update, else insert
+    Object idObj = map.get("id");
+    if (idObj != null) {
+        Long id = Long.valueOf(String.valueOf(idObj));
 
-        // ✅ handle images flexibly (string URLs or map objects)
-        Object imagesObj = map.get("images");
-        if (imagesObj instanceof List<?>) {
-            List<?> imagesList = (List<?>) imagesObj;
-            for (Object img : imagesList) {
-                if (img instanceof Map) {
-                    Map<String, Object> imgMap = (Map<String, Object>) img;
-                    String url = (String) imgMap.get("url");
-                    boolean thumbnail = Boolean.TRUE.equals(imgMap.get("thumbnail"));
-                    boolean banner = Boolean.TRUE.equals(imgMap.get("banner"));
-                    e.addImage(url, thumbnail, banner);
-                } else if (img instanceof String) {
-                    // If image is just a URL string
-                    e.addImage((String) img, false, false);
-                }
-            }
+        // Try to load existing entity
+        e = service.findById(id);
+        if (e == null) {
+            throw new RuntimeException("NewsEvent not found with ID: " + id);
         }
 
-        return e;
+        e.setBacktocreator(Boolean.parseBoolean(map.get("backtocreator").toString()));
+
+        // Clear old images (orphanRemoval = true will delete from DB)
+        e.getImages().clear();
+        e.setId(id);
+
+    } else {
+        // Insert new
+        e = new NewsEvent();
     }
+
+    // Set basic fields
+    e.setName((String) map.get("name"));
+    e.setTitle((String) map.get("title"));
+    e.setType(type);
+
+    // Dates
+    if (map.get("date") != null)
+        e.setDate(java.sql.Date.valueOf((String) map.get("date")));
+    if (map.get("startDate") != null)
+        e.setStartDate(java.sql.Date.valueOf((String) map.get("startDate")));
+    if (map.get("endDate") != null)
+        e.setEndDate(java.sql.Date.valueOf((String) map.get("endDate")));
+
+    // Images
+    Object imagesObj = map.get("images");
+    if (imagesObj instanceof List<?>) {
+        List<?> imagesList = (List<?>) imagesObj;
+
+        for (Object img : imagesList) {
+            if (img instanceof Map) {
+                Map<String, Object> imgMap = (Map<String, Object>) img;
+                String url = (String) imgMap.get("url");
+                boolean thumbnail = Boolean.TRUE.equals(imgMap.get("thumbnail"));
+                boolean banner = Boolean.TRUE.equals(imgMap.get("banner"));
+                e.addImage(url, thumbnail, banner);
+            } else if (img instanceof String) {
+                e.addImage((String) img, false, false);
+            }
+        }
+    }
+
+    return e;
+}
 
     // ✅ Entity → Response mapper
     private NewsEventResponse mapToResponse(NewsEvent e) {

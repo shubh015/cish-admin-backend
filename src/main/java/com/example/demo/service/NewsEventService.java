@@ -1,6 +1,5 @@
 package com.example.demo.service;
 
-
 import com.example.demo.web.models.Innovation;
 import com.example.demo.web.models.event.NewsEvent;
 
@@ -30,26 +29,36 @@ public class NewsEventService {
 
     public List<NewsEvent> getByType(String type, String role) {
 
-        if(role != null ){
-            if(role.equalsIgnoreCase("admin"))
-               return repo.findByTypeIgnoreCaseAndIspublishedFalseAndIsactiveTrueAndBacktocreatorFalse(type);
-            if(role.equalsIgnoreCase("creator"))
-                return repo.findByTypeIgnoreCaseAndBacktocreatorTrueAndIsactiveTrue(type);     
+        if (role != null) {
+            if (role.equalsIgnoreCase("admin"))
+                return repo.findByTypeIgnoreCaseAndIspublishedFalseAndIsactiveTrueAndBacktocreatorFalse(type);
+            if (role.equalsIgnoreCase("creator"))
+                return repo.findByTypeIgnoreCaseAndBacktocreatorTrueAndIsactiveTrue(type);
         }
         return repo.findByTypeIgnoreCaseAndIspublishedTrueAndIsactiveTrue(type);
     }
 
     @Transactional
-public void updateStatus(List<Long> ids, Boolean isPublished, Boolean isActive, Boolean backToCreator) {
-    for (Long id : ids) {
-        NewsEvent innovation = repo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Innovation not found with ID: " + id));
+    public void updateStatus(List<Long> ids, Boolean isPublished, Boolean isActive, Boolean backToCreator) {
+        for (Long id : ids) {
+            NewsEvent innovation = repo.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Innovation not found with ID: " + id));
 
-        if (isPublished != null) innovation.setIspublished(isPublished);
-        if (isActive != null) innovation.setIsactive(isActive);
-        if (backToCreator != null) innovation.setBacktocreator(backToCreator);
+            if (isPublished != null)
+                innovation.setIspublished(isPublished);
+            if (isActive != null)
+                innovation.setIsactive(isActive);
+            if (backToCreator != null)
+                innovation.setBacktocreator(backToCreator);
 
-        repo.save(innovation);
+            repo.save(innovation);
+        }
+
     }
+
+
+    public NewsEvent findById(Long id) {
+    return repo.findById(id).orElse(null);
 }
+
 }
