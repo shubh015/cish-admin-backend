@@ -43,4 +43,18 @@ public class FileUpload {
 
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
+
+
+    @Builder.Default
+@Column(name = "ispublished", nullable = false)
+private Boolean ispublished = false;
+
+@Builder.Default
+@Column(name = "isactive", nullable = false)
+private Boolean active = true;
+
+@Builder.Default
+@Column(name = "backtocreator", nullable = false)
+private Boolean backtocreator = false;
+
 }

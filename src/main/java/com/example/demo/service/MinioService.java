@@ -5,9 +5,15 @@ package com.example.demo.service;
 import io.minio.*;
 import io.minio.messages.Item;
 import jakarta.annotation.PostConstruct;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.example.demo.repository.FileUploadRepository;
+import com.example.demo.web.models.FileUpload;
 
 import java.io.InputStream;
 import java.util.*;
@@ -31,6 +37,9 @@ public class MinioService {
     private boolean secure;
 
     private MinioClient minioClient;
+    
+    @Autowired
+    private FileUploadRepository fileUploadRepository;
 
     @PostConstruct
     public void init() {
@@ -108,5 +117,46 @@ public String getBucketName() {
 public String getMinioUrl() {
     return minioUrl;
 }
+
+
+  @Transactional
+    public void updateDirectorUploadStatus(List<Long> ids,
+                                           Boolean isPublished,
+                                           Boolean isActive,
+                                           Boolean backToCreator) {
+
+        for (Long id : ids) {
+
+            FileUpload file = fileUploadRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("File not found: " + id));
+
+            // Update only non-null values
+            if (isPublished != null) file.setIspublished(isPublished);
+            if (isActive != null) file.setActive(isActive);
+            if (backToCreator != null) file.setBacktocreator(backToCreator);
+
+            fileUploadRepository.save(file);
+        }
+    }
+
+
+    public List<FileUpload> getDirectorFilesByRole(String role) {
+
+        if (role != null) {
+            if (role.equalsIgnoreCase("admin")) {
+                return fileUploadRepository
+                        .findByIsDirectorTrueAndIspublishedFalseAndActiveTrueAndBacktocreatorFalse();
+            }
+            if (role.equalsIgnoreCase("creator")) {
+                return fileUploadRepository
+                        .findByIsDirectorTrueAndBacktocreatorTrueAndActiveTrue();
+            }
+        }
+
+        // DEFAULT → Published + Active
+        return fileUploadRepository
+                .findByIsDirectorTrueAndIspublishedTrueAndActiveTrue();
+    }
+
 
 }

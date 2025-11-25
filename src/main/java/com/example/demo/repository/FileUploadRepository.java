@@ -8,4 +8,10 @@ import java.util.List;
 
 public interface FileUploadRepository extends JpaRepository<FileUpload, Long> {
     List<FileUpload> findByIsDirector(boolean isDirector);
+
+    List<FileUpload> findByIsDirectorTrueAndIspublishedFalseAndActiveTrueAndBacktocreatorFalse();
+
+    List<FileUpload> findByIsDirectorTrueAndBacktocreatorTrueAndActiveTrue();
+
+    List<FileUpload> findByIsDirectorTrueAndIspublishedTrueAndActiveTrue();
 }

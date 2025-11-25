@@ -156,4 +156,83 @@ public class MinioControllerTest {
                 .contentType(MediaType.IMAGE_JPEG)
                 .body(bytes);
     }
+
+
+
+    @PostMapping("/upload/director/status")
+@CrossOrigin("*")
+public ResponseEntity<?> updateDirectorUploadStatus(@RequestBody Map<String, Object> payload) {
+    try {
+        String key = (String) payload.get("key");
+
+        if (key == null || !payload.containsKey("ids")) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Missing key or ids"));
+        }
+
+        List<Long> ids = ((List<?>) payload.get("ids"))
+                .stream()
+                .map(id -> Long.valueOf(String.valueOf(id)))
+                .toList();
+
+        if (ids.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "ids cannot be empty"));
+        }
+
+        Boolean isPublished = null, active = null, backToCreator = null;
+
+        // Key-based status logic
+        switch (key.toLowerCase()) {
+            case "publish" -> {
+                isPublished = true;
+                active = true;
+                backToCreator = false;
+            }
+            case "unpublish" -> {
+                isPublished = false;
+                active = true;
+                backToCreator = false;
+            }
+            case "delete" -> {
+                active = false;
+            }
+            case "backtocreator" -> {
+                backToCreator = true;
+                isPublished = false;
+            }
+            default -> {
+                return ResponseEntity.badRequest().body(Map.of("error", "Invalid key"));
+            }
+        }
+
+        minioService.updateDirectorUploadStatus(ids, isPublished, active, backToCreator);
+
+        return ResponseEntity.ok(Map.of(
+                "message", "Status updated successfully",
+                "updatedRecords", ids.size()
+        ));
+
+    } catch (Exception e) {
+        e.printStackTrace();
+        return ResponseEntity.internalServerError().body(Map.of("error", e.getMessage()));
+    }
+}
+
+
+@GetMapping("/director")
+@CrossOrigin("*")
+public ResponseEntity<?> getDirectorFiles(
+        @RequestParam(required = false) String role) {
+
+    try {
+        List<FileUpload> list = minioService.getDirectorFilesByRole(role);
+        return ResponseEntity.ok(list);
+    } catch (Exception e) {
+        e.printStackTrace();
+        return ResponseEntity.internalServerError().body(
+                Map.of("error", e.getMessage())
+        );
+    }
+}
+
+
 }
