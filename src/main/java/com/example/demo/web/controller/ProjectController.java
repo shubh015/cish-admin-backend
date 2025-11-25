@@ -63,22 +63,20 @@ public class ProjectController {
     public ResponseEntity<List<ExternalProject>> getAllExternalProjects( @RequestParam(value = "role", required = false) String role) {
         return ResponseEntity.ok(projectService.getAllExternalProjects(role));
     }
-
-
-
 @PostMapping("/status")
 @CrossOrigin("*")
 public ResponseEntity<String> updateProjectStatus(@RequestBody Map<String, Object> payload) {
     try {
         String key = (String) payload.get("key");
-        String projectType = (String) payload.get("type"); // "house" or "external"
+        Object remarkObj = payload.get("remark");
+        String remark = remarkObj != null ? remarkObj.toString() : null;
 
-        if (key == null || projectType == null || !payload.containsKey("ids")) {
+        if (key == null || !payload.containsKey("ids")) {
             return ResponseEntity.badRequest()
-                    .body("❌ Missing 'key', 'type', or 'ids' in request.");
+                    .body("❌ Missing 'key' or 'ids' in request.");
         }
 
-        // ✅ Safely convert ids
+        // Convert IDs safely
         List<Long> ids = ((List<?>) payload.get("ids"))
                 .stream()
                 .map(id -> Long.valueOf(String.valueOf(id)))
@@ -88,33 +86,44 @@ public ResponseEntity<String> updateProjectStatus(@RequestBody Map<String, Objec
             return ResponseEntity.badRequest().body("❌ 'ids' list cannot be empty.");
         }
 
-        // ✅ Determine update flags
-        Boolean isPublished = null, isActive = null, backToCreator = null;
+        // Status flags
+        Boolean isPublished = null;
+        Boolean isActive = null;
+        Boolean backToCreator = null;
 
         switch (key.toLowerCase()) {
-            case "publish" -> { isPublished = true; isActive = true; backToCreator = false; }
-            case "delete" -> { isPublished = null; isActive = false; backToCreator = null; }
-            case "backtocreator" -> { isPublished = false; isActive = null; backToCreator = true; }
+            case "publish" -> {
+                isPublished = true;
+                isActive = true;
+                backToCreator = false;
+            }
+            case "delete" -> {
+                isPublished = null;
+                isActive = false;
+                backToCreator = null;
+            }
+            case "backtocreator" -> {
+                isPublished = false;
+                isActive = null;
+                backToCreator = true;
+            }
             default -> {
                 return ResponseEntity.badRequest()
                         .body("❌ Invalid key. Use 'publish', 'delete', or 'backToCreator'.");
             }
         }
 
-        // ✅ Route based on type
-        switch (projectType.toLowerCase()) {
-            case "house" -> projectService.updateHouseProjectStatus(ids, isPublished, isActive, backToCreator);
-            case "external" -> projectService.updateExternalProjectStatus(ids, isPublished, isActive, backToCreator);
-            default -> {
-                return ResponseEntity.badRequest().body("❌ Invalid type. Use 'house' or 'external'.");
-            }
-        }
+        // 🔥 Single method that updates both House + External if ID exists
+        projectService.updateProjectStatusByIds(ids, isPublished, isActive, backToCreator, remark);
 
-        return ResponseEntity.ok("✅ Status updated for " + ids.size() + " " + projectType + " project(s) with action: " + key);
+        return ResponseEntity.ok("✅ Status updated for " + ids.size() + " record(s).");
+
     } catch (Exception e) {
         return ResponseEntity.internalServerError().body("❌ Error: " + e.getMessage());
     }
 }
+
+
 
 }
 

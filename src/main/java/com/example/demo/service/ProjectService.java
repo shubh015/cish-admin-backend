@@ -80,5 +80,32 @@ public class ProjectService {
     }
 
 
+    @Transactional
+    public void updateProjectStatusByIds(List<Long> ids, Boolean isPublished, Boolean isActive,
+                                         Boolean backToCreator, String remark) {
 
+        for (Long id : ids) {
+
+            // --- Try House Project ---
+            houseRepo.findById(id).ifPresent(project -> {
+                if (isPublished != null) project.setIspublished(isPublished);
+                if (isActive != null) project.setIsactive(isActive);
+                if (backToCreator != null) project.setBacktocreator(backToCreator);
+               // if (remark != null) project.setRemark(remark);
+                houseRepo.save(project);
+            });
+
+            // --- Try External Project ---
+            externalRepo.findById(id).ifPresent(project -> {
+                if (isPublished != null) project.setIspublished(isPublished);
+                if (isActive != null) project.setIsactive(isActive);
+                if (backToCreator != null) project.setBacktocreator(backToCreator);
+               // if (remark != null) project.setRemark(remark);
+                externalRepo.save(project);
+            });
+        }
+    }
 }
+
+
+
