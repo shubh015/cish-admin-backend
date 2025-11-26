@@ -128,6 +128,20 @@ public String saveMedia(@RequestBody Map<String, Object> payload) {
         mediaFiles.addAll(bannerFiles);
     }
 
+     if (payload.containsKey("isDirector")) {
+        List<Map<String, Object>> bannerList = (List<Map<String, Object>>) payload.get("isDirector");
+        List<MediaFile> bannerFiles = bannerList.stream()
+                .map(item -> MediaFile.builder()
+                        .id(item.get("id") != null ? Long.valueOf(item.get("id").toString()) : null)
+                        .type("director")
+                        .url((String) item.get("url"))
+                        .description(item.get("description") != null ? item.get("description").toString() : null)
+                        .backtocreator(item.get("backtocreator") != null ? Boolean.parseBoolean(item.get("backtocreator").toString()) : false)
+                        .build())
+                .collect(Collectors.toList());
+        mediaFiles.addAll(bannerFiles);
+    }
+
     // ✅ Save all collected media entries
     if (!mediaFiles.isEmpty()) {
         service.saveAll(mediaFiles);
