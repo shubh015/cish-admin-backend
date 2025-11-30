@@ -27,7 +27,7 @@ public class KeyContent {
     private LocalDate date;
     private LocalDate postDate;
     private LocalDate lastDate;
-
+        private String createdby;
     private String link;
 
      @Column(name = "result_documents", columnDefinition = "TEXT")

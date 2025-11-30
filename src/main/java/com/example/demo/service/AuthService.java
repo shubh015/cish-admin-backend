@@ -1,6 +1,9 @@
 package com.example.demo.service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -53,12 +56,15 @@ public AuthResponse login(AuthRequest req) {
 
     UserDetails ud = (UserDetails) auth.getPrincipal();
     String token = jwtService.generateToken(ud);
-
+    Optional<User> user = userRepo.findByUsername(req.getUsername());
+    
     // Extract roles from UserDetails
     List<String> roles = ud.getAuthorities().stream()
-            .map(authObj -> authObj.getAuthority())
-            .toList();
-
+        .map(authObj -> authObj.getAuthority())
+        .collect(Collectors.toCollection(ArrayList::new));
+    if(!user.isEmpty() && user.get().getDesig() !=  null){
+        roles.add(user.get().getDesig());
+    }
     return new AuthResponse(token, "Bearer", roles);
 }
 

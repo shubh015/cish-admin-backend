@@ -27,7 +27,7 @@ public class ExternalProject {
     @Column(updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
-
+        private String createdby;
 
     // ✅ Newly added flags
     @Builder.Default

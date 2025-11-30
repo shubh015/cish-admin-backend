@@ -60,6 +60,7 @@ public String saveMedia(@RequestBody Map<String, Object> payload) {
                         .thumbnail(Boolean.TRUE.equals(item.get("thumbnail")))
                         .title(finalTitle)
                         .publishDate(finalPublishDate)
+                        .createdby((String) item.get("createdby"))
                         .build())
                 .collect(Collectors.toList());
         mediaFiles.addAll(imageFiles);
@@ -77,6 +78,7 @@ public String saveMedia(@RequestBody Map<String, Object> payload) {
                         .thumbnail(Boolean.TRUE.equals(item.get("thumbnail")))
                         .title(finalTitle)
                         .publishDate(finalPublishDate)
+                        .createdby((String) item.get("createdby"))
                         .build())
                 .collect(Collectors.toList());
         mediaFiles.addAll(videoFiles);
@@ -103,6 +105,7 @@ public String saveMedia(@RequestBody Map<String, Object> payload) {
                             .title(finalAbicTitle != null ? finalAbicTitle : finalAbicName)
                             .publishDate(finalPublishDate)
                              .backtocreator(abic.get("backtocreator") != null ? Boolean.parseBoolean(abic.get("backtocreator").toString()) : false)
+                             .createdby((String) abic.get("createdby"))
                             .build())
                     .collect(Collectors.toList());
             mediaFiles.addAll(abicImageFiles);
@@ -123,6 +126,7 @@ public String saveMedia(@RequestBody Map<String, Object> payload) {
                         .title(finalTitle)
                         .publishDate(finalPublishDate)
                         .backtocreator(item.get("backtocreator") != null ? Boolean.parseBoolean(item.get("backtocreator").toString()) : false)
+                        .createdby((String) item.get("createdby"))
                         .build())
                 .collect(Collectors.toList());
         mediaFiles.addAll(bannerFiles);
@@ -137,6 +141,7 @@ public String saveMedia(@RequestBody Map<String, Object> payload) {
                         .url((String) item.get("url"))
                         .description(item.get("description") != null ? item.get("description").toString() : null)
                         .backtocreator(item.get("backtocreator") != null ? Boolean.parseBoolean(item.get("backtocreator").toString()) : false)
+                        .createdby((String) item.get("createdby"))
                         .build())
                 .collect(Collectors.toList());
         mediaFiles.addAll(bannerFiles);

@@ -16,6 +16,7 @@ public class NewsEventResponse {
     private String type;
     private Date startDate;
     private Date endDate;
+    private String createdby;
 
     // ✅ Each image will have both "url" and "thumbnail"
     private List<ImageResponse> images;

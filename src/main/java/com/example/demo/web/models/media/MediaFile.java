@@ -24,6 +24,8 @@ public class MediaFile {
 
     private String description;
 
+       private String createdby;
+
     @Column(name = "publish_date")
     private Date publishDate;
 

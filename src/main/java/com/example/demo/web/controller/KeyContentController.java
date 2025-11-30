@@ -84,6 +84,7 @@ public String saveContent(@RequestBody Map<String, List<Map<String, Object>>> pa
                     .postDate(item.get("postDate") != null ? LocalDate.parse((String) item.get("postDate"), formatter) : null)
                     .lastDate(item.get("lastDate") != null ? LocalDate.parse((String) item.get("lastDate"), formatter) : null)
                     .backtocreator(flag)
+                    .createdby((String) item.get("createdby"))
                     .build(); 
             } else{
 
@@ -97,6 +98,7 @@ public String saveContent(@RequestBody Map<String, List<Map<String, Object>>> pa
                     .date(item.get("date") != null ? LocalDate.parse((String) item.get("date"), formatter) : null)
                     .postDate(item.get("postDate") != null ? LocalDate.parse((String) item.get("postDate"), formatter) : null)
                     .lastDate(item.get("lastDate") != null ? LocalDate.parse((String) item.get("lastDate"), formatter) : null)
+                    .createdby((String) item.get("createdby"))
                     .build();
             }  
         }).toList();

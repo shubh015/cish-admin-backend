@@ -32,6 +32,7 @@ public class ProjectController {
             project.setActivityName((String) data.get("activityName"));
             project.setPrincipalInvestigator((String) data.get("principalInvestigator"));
             project.setCoPrincipalInvestigator((String) data.get("coPrincipalInvestigator"));
+            project.setCreatedby((String) data.get("createdby"));
             projectService.saveHouseProject(project);
             return ResponseEntity.ok("✅ House Project saved successfully.");
         }
@@ -44,6 +45,7 @@ public class ProjectController {
             project.setPiOffice((String) data.get("piOffice"));
             project.setStartDate(java.time.LocalDate.parse((String) data.get("startDate")));
             project.setEndDate(java.time.LocalDate.parse((String) data.get("endDate")));
+            project.setCreatedby((String) data.get("createdby"));
             projectService.saveExternalProject(project);
             return ResponseEntity.ok("✅ External Project saved successfully.");
         }

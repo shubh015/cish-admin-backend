@@ -104,6 +104,9 @@ private NewsEvent mapToEntity(Map<String, Object> map, String type) {
     if (map.get("endDate") != null)
         e.setEndDate(java.sql.Date.valueOf((String) map.get("endDate")));
 
+    if (map.get("createdby") != null)
+        e.setCreatedby((String) map.get("createdby"));
+
     // Images
     Object imagesObj = map.get("images");
     if (imagesObj instanceof List<?>) {
@@ -135,6 +138,7 @@ private NewsEvent mapToEntity(Map<String, Object> map, String type) {
         res.setStartDate(e.getStartDate());
         res.setEndDate(e.getEndDate());
         res.setType(e.getType());
+        res.setCreatedby(e.getCreatedby());
 
         // ✅ Map both URL and thumbnail flag into ImageResponse objects
         List<NewsEventResponse.ImageResponse> imageResponses = e.getImages().stream()

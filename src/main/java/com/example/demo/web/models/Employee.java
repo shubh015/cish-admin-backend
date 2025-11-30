@@ -30,6 +30,8 @@ public class Employee {
     private String mscFrom;
     private String phdFrom;
 
+    private String createdby;
+
     @Column(length = 1000)
     private String photo;
 

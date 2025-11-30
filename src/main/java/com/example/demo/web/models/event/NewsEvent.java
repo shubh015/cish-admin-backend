@@ -34,6 +34,8 @@ public class NewsEvent {
     @Column(name = "end_date")
     private Date endDate;
 
+    private String createdby;
+
     @Builder.Default
     @Column(name = "ispublished", nullable = false)
     private Boolean ispublished = false;

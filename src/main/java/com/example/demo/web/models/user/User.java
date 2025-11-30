@@ -43,6 +43,9 @@ public class User {
     @Column(name = "mobile", nullable = false)
     private String  mobile;
 
+    @Column(name = "desig")
+    private String  desig;
+
     private Boolean enabled = true;
     private Boolean accountNonLocked = true;
     @ManyToMany(fetch = FetchType.LAZY)

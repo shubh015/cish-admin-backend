@@ -23,6 +23,8 @@ public class HouseProject {
     private String principalInvestigator;
     private String coPrincipalInvestigator;
 
+        private String createdby;
+
     @Column(updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 

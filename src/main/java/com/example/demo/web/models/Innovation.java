@@ -51,7 +51,8 @@ public class Innovation {
     private String ppvfraRegistration;
 
     private String details;
-
+    
+    private String createdby;
     private String natureOfLicense;
     private String licenseDuration;
     private String licensingTerritory;
