@@ -14,6 +14,7 @@ public class RegisterRequest {
     @NotBlank
     @Pattern(regexp = "^[0-9]{10,15}$", message = "Mobile number must be 10 to 15 digits")
     private String mobile;
+    private String desig;
 
   @NotBlank @Size(min=8, max=128) private String password;
 }

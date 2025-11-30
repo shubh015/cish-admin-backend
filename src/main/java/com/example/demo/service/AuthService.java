@@ -44,6 +44,7 @@ public class AuthService {
     u.setEmail(req.getEmail());
     u.setMobile(req.getMobile());
     u.setPasswordHash(passwordEncoder.encode(req.getPassword()));
+    u.setDesig(req.getDesig());
     Role defaultRole = roleRepo.findByName("ROLE_USER")
         .orElseGet(() -> roleRepo.save(new Role(null, "ROLE_USER", "Default user")));
     u.getRoles().add(defaultRole);
