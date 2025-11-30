@@ -62,10 +62,11 @@ public AuthResponse login(AuthRequest req) {
     List<String> roles = ud.getAuthorities().stream()
         .map(authObj -> authObj.getAuthority())
         .collect(Collectors.toCollection(ArrayList::new));
+    String desig = null;    
     if(!user.isEmpty() && user.get().getDesig() !=  null){
-        roles.add(user.get().getDesig());
+       desig = user.get().getDesig();
     }
-    return new AuthResponse(token, "Bearer", roles);
+    return new AuthResponse(token, "Bearer", roles, desig);
 }
 
 }

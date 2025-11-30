@@ -10,5 +10,6 @@ public class AuthResponse {
      private String accessToken; 
      private String tokenType = "Bearer"; 
       private List<String> roles;
+      private String desig;
     }
 
